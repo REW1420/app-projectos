@@ -1,4 +1,5 @@
 import React from "react";
+import { Text, Pressable } from "react-native";
 import "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import Login from "../Screens/Login";
@@ -14,15 +15,13 @@ import ProjectController from "../../utils/Networking/ProjectController";
 const ProjectNetworking = new ProjectController();
 const Stack = createStackNavigator();
 export default function StackNavigator() {
-  const { misionData, projectTitle } = React.useContext(AppContext);
-  const { FABvisibility, setFABvisibility } = React.useContext(AppContext);
-  const { isOwner } = React.useContext(AppContext);
+  const { state, dispatch } = React.useContext(AppContext);
   const data = {
-    projectName: projectTitle,
+    projectName: state.projectTitle,
 
     team: [{ id: "user2" }, { id: "user3" }],
     projectOwner: "user2",
-    ...misionData,
+    ...state.misionData,
   };
   return (
     <Stack.Navigator initialRouteName="login">
@@ -42,20 +41,24 @@ export default function StackNavigator() {
         options={{
           headerTitle: "",
           headerRight: () =>
-            isOwner ? (
-              FABvisibility === false ? (
+            state.isOwner ? (
+              state.FABvisibility === false ? (
                 <Icon
                   style={{ marginRight: 20 }}
                   name="build-outline"
                   size={25}
-                  onPress={() => setFABvisibility(true)}
+                  onPress={() =>
+                    dispatch({ type: "SET_FAB_VISIBILITY", payload: true })
+                  }
                 />
               ) : (
                 <Icon
                   style={{ marginRight: 20 }}
                   name="stop-circle-outline"
                   size={25}
-                  onPress={() => setFABvisibility(false)}
+                  onPress={() =>
+                    dispatch({ type: "SET_FAB_VISIBILITY", payload: false })
+                  }
                 />
               )
             ) : null,
@@ -74,21 +77,18 @@ export default function StackNavigator() {
         options={{
           headerTitle: "Agregar nuevo projecto",
           headerRight: () => (
-            <Icon
+            <Pressable
               onPress={() => {
-                try {
-                  ProjectNetworking.createProject(data);
-                } catch (error) {
-                  console.log(error);
-                }
+                console.log("a");
               }}
-              name="save-outline"
-              size={30}
-              color={"black"}
-              style={{
-                marginRight: "15%",
-              }}
-            />
+              style={{ marginRight: 15 }}
+            >
+              <Text
+                style={{ color: "#2B5664", fontSize: 15, fontWeight: "400" }}
+              >
+                Guardar
+              </Text>
+            </Pressable>
           ),
         }}
       />

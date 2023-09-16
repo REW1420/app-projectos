@@ -2,7 +2,12 @@ import { View, Text, Button } from "react-native";
 import React from "react";
 import Modal from "react-native-modal";
 import CustomButton from "../Buttons/CustomButton";
-export default function AlertModal({ isModalVisible, back,handleDelete }) {
+export default function AlertModal({
+  isModalVisible,
+  back,
+  handleDelete,
+  title,
+}) {
   const [visible, setVisible] = React.useState(isModalVisible);
   return (
     <Modal
@@ -27,12 +32,12 @@ export default function AlertModal({ isModalVisible, back,handleDelete }) {
             marginVertical: 15,
           }}
         >
-          <Text>¿Estas seguro de eliminar el projecto?</Text>
+          <Text>{title}</Text>
         </View>
 
         <View style={{ flexDirection: "row" }}>
           <CustomButton tittle={"Cancelar"} onPress={back} />
-          <CustomButton tittle={"Eliminar"} onPress={handleDelete}/>
+          <CustomButton tittle={"Aceptar"} onPress={handleDelete} />
         </View>
       </View>
     </Modal>

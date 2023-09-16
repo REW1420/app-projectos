@@ -18,7 +18,7 @@ export default function AddProject() {
   const [numInputs, setNumInputs] = useState(1);
   const refInputs = useRef([textValue]);
   //app context
-  const { setMisionData } = useContext(AppContext);
+  const { dispatch } = useContext(AppContext);
   const [tmpMisionData, setTempMisionData] = useState({
     mision: [{}],
   });
@@ -79,7 +79,7 @@ export default function AddProject() {
       status: "Pendiente",
       [field]: value,
     };
-    setMisionData(updateData);
+    dispatch({ type: "SET_MISION_DATA", payload: updateData });
     setTextValue(value);
   };
   const addInput = () => {
@@ -91,7 +91,7 @@ export default function AddProject() {
   const removeInput = (i) => {
     const updateData = { ...tmpMisionData };
     updateData.mision.pop();
-    setMisionData(updateData);
+    dispatch({ type: "SET_MISION_DATA", payload: updateData });
     // Eliminar del array por valor de índice
     refInputs.current.splice(i, 1);
     // Disminuir el número de entradas
@@ -101,7 +101,7 @@ export default function AddProject() {
   return (
     <ScrollView>
       <View style={{ marginTop: 15, ...styles.container }}>
-        <Text style={{ fontSize: 30 }}>Crea un nuevo project</Text>
+        <Text style={{ fontSize: 30 }}>Crea un nuevo projecto</Text>
       </View>
       <NewProjectCard />
       <View style={{ marginTop: 15, ...styles.container }}>
@@ -109,12 +109,8 @@ export default function AddProject() {
       </View>
       {inputs}
 
-      <CustomButton onPress={addInput} tittle={"Agregar nueva mision"} />
-      <View style={{ marginTop: 25 }}>
-        <Text>You have answered:</Text>
-        {refInputs.current.map((value, i) => {
-          return <Text key={i}>{`${i + 1} - ${value}`}</Text>;
-        })}
+      <View style={{ marginBottom: 20 }}>
+        <CustomButton onPress={addInput} tittle={"Agregar nueva mision"} />
       </View>
     </ScrollView>
   );

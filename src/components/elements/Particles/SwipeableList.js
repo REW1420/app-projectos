@@ -4,40 +4,13 @@ import { ListItem, Button } from "@rneui/themed";
 import Icon from "react-native-vector-icons/Ionicons";
 import ProjectController from "../../../utils/Networking/ProjectController";
 const ProjecNetworking = new ProjectController();
-const handleUpdateToWork = async (projectId, misionId) => {
-  const response = await ProjecNetworking.updateMisionStatus(
-    projectId,
-    misionId,
-    "Trabajando"
-  );
-  console.log(response);
-};
-const handleUpdateToPending = async (projectId, misionId) => {
-  const response = await ProjecNetworking.updateMisionStatus(
-    projectId,
-    misionId,
-    "Pendiente"
-  );
-  console.log(response);
-};
-const handleUpdateToFinished = async (projectId, misionId) => {
-  const response = await ProjecNetworking.updateMisionStatus(
-    projectId,
-    misionId,
-    "Terminado"
-  );
-  const res = await ProjecNetworking.updateMisionFinished(projectId, misionId);
-  console.log(response, res);
-};
+
 export default function SwipeableList({
   tittle,
   status,
-  Laction,
-  Raction,
   refresh,
   onPressSnap,
-  misionId,
-  projectId,
+  updateAction,
 }) {
   return (
     <SafeAreaView>
@@ -55,11 +28,11 @@ export default function SwipeableList({
                 margin: 5,
                 justifyContent: "center",
               }}
-              onPress={() => {
+              onPress={async () => {
                 console.log("res");
-                handleUpdateToWork(projectId, misionId);
+                await updateAction();
                 refresh();
-                reset()
+                //reset();
               }}
               icon={<Icon name="thumbs-up-outline" size={35} color={"green"} />}
               buttonStyle={{ minHeight: "110%", backgroundColor: "white" }}
@@ -81,13 +54,10 @@ export default function SwipeableList({
 export function WorkingSwipeableList({
   tittle,
   status,
-  Laction,
-  Raction,
-  MissionDetail,
+
   onPressSnap,
   refresh,
-  misionId,
-  projectId,
+  updateAction,
 }) {
   return (
     <SafeAreaView>
@@ -104,10 +74,10 @@ export function WorkingSwipeableList({
               margin: 5,
               justifyContent: "center",
             }}
-            onPress={() => {
-              handleUpdateToPending(projectId, misionId);
+            onPress={async () => {
+              await updateAction();
               refresh();
-              reset();
+              //   reset();
             }}
             icon={<Icon name="stop-circle-outline" size={35} color={"red"} />}
             buttonStyle={{ minHeight: "110%", backgroundColor: "white" }}
@@ -121,7 +91,7 @@ export function WorkingSwipeableList({
                 margin: 5,
                 justifyContent: "center",
               }}
-              onPress={Raction}
+              //  onPress={Raction}
               icon={<Icon name="checkmark-outline" size={35} color={"green"} />}
               buttonStyle={{ minHeight: "110%", backgroundColor: "white" }}
             />

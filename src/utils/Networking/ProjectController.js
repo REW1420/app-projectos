@@ -128,7 +128,7 @@ export default class ProjectController {
       throw error;
     }
   }
-  async updateProjectClose(projectId) {
+  async updateProjectClose(projectId, status) {
     try {
       const response = await fetch(
         BASE_URL + `projects/update-close/${projectId}`,
@@ -136,7 +136,7 @@ export default class ProjectController {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            isFinished: true,
+            isFinished: status,
           }),
         }
       );

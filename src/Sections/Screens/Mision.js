@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, RefreshControl } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import { styles } from "../../utils/Styles";
 import PercentageCard from "../../components/elements/Cards/PercentageCard";
 import { useRoute } from "@react-navigation/native";
@@ -13,17 +13,30 @@ import CustomButton from "../../components/elements/Buttons/CustomButton";
 import AppContext from "../../utils/context/AppContext";
 import AlertModal from "../../components/elements/Modals/AlertModal";
 import ProjectController from "../../utils/Networking/ProjectController";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 const ProjecNetworking = new ProjectController();
 
 export default function Mision() {
   const navigation = useNavigation();
-  const { setIsOwner, FABvisibility } = React.useContext(AppContext);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Esta función se ejecutará cuando esta pantalla obtenga el foco.
+      console.log("Pantalla enfocada");
+      return () => {
+        // Esta función se ejecutará cuando se deje esta pantalla.
+        dispatch({ type: "SET_FAB_VISIBILITY", payload: false });
+      };
+    }, [])
+  );
+
+  const { state, dispatch } = React.useContext(AppContext);
   const route = useRoute();
   const [projectInfo, setProjectInfo] = React.useState(
     route.params?.projectInfo
   );
   const bottomSheetRef = React.useRef(null);
+
   const [itemDescription, setItemDescription] = React.useState("");
   const [owner, setOwner] = React.useState("");
   const handleSnapPress = React.useCallback((index) => {
@@ -33,6 +46,7 @@ export default function Mision() {
   const [totalFinished, setTotalFinished] = React.useState(0);
   const [total, setTotal] = React.useState(0);
   React.useEffect(() => {
+    handleGetData();
     handleSetOwnerShip();
     const misionesTerminadas = projectInfo.mision.filter(
       (mision) => mision.isFinished === true
@@ -43,15 +57,23 @@ export default function Mision() {
   }, []);
   const handleSetOwnerShip = () => {
     if (projectInfo.projectOwner === "user1") {
-      setIsOwner(true);
+      dispatch({ type: "SET_IS_OWNER", payload: true });
     } else {
-      setIsOwner(false);
+      dispatch({ type: "SET_IS_OWNER", payload: false });
     }
   };
   const [isModalVisible, setModalVisible] = React.useState(false);
+  const [isModalVisibleStop, setModalVisibleStop] = React.useState(false);
+  const [isModalVisibleStart, setModalVisibleStart] = React.useState(false);
 
+  const toggleModalStart = () => {
+    setModalVisibleStart(!isModalVisibleStart);
+  };
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
+  };
+  const toggleModalStop = () => {
+    setModalVisibleStop(!isModalVisibleStop);
   };
   const handleDelete = async () => {
     const res = await ProjecNetworking.deleteFromID(projectInfo._id);
@@ -59,18 +81,65 @@ export default function Mision() {
     toggleModal();
     navigation.navigate("Proyectos");
   };
+  const handleCloseProject = async () => {
+    const res = await ProjecNetworking.updateProjectClose(
+      projectInfo._id,
+      true
+    );
+    console.log(res);
+    toggleModal();
+    navigation.navigate("Proyectos");
+  };
   const [refreshing, setRefreshing] = React.useState(false);
   const handleGetData = async () => {
-    setRefreshing(true);
     const res = await ProjecNetworking.getSingleProjectInfo(projectInfo._id);
     setProjectInfo(res);
     console.log(res);
-
-    setRefreshing(false);
   };
   const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
     handleGetData();
+    setRefreshing(false);
   }, []);
+  const [misionId, setMisionId] = React.useState("");
+
+  const handleUpdateToWork = async (projectId, misionId) => {
+    const response = await ProjecNetworking.updateMisionStatus(
+      projectId,
+      misionId,
+      "Trabajando"
+    );
+    console.log(response);
+  };
+  const handleUpdateToPending = async (projectId, misionId) => {
+    const response = await ProjecNetworking.updateMisionStatus(
+      projectId,
+      misionId,
+      "Pendiente"
+    );
+    console.log(response);
+  };
+  const handleUpdateToFinished = async (projectId, misionId) => {
+    const response = await ProjecNetworking.updateMisionStatus(
+      projectId,
+      misionId,
+      "Terminado"
+    );
+    const res = await ProjecNetworking.updateMisionFinished(
+      projectId,
+      misionId
+    );
+    console.log(response, res);
+  };
+  const handleStartProject = async () => {
+    const res = await ProjecNetworking.updateProjectClose(
+      projectInfo._id,
+      false
+    );
+    console.log(res);
+    toggleModal();
+    navigation.navigate("Proyectos");
+  };
   return (
     <React.Fragment>
       <ScrollView
@@ -106,7 +175,10 @@ export default function Mision() {
                   status={item.status}
                   misionId={item.id}
                   projectId={projectInfo._id}
-                  refresh={() => onRefresh()}
+                  refresh={() => handleGetData()}
+                  updateAction={() =>
+                    handleUpdateToPending(projectInfo._id, item.id)
+                  }
                 />
               );
             }
@@ -128,7 +200,13 @@ export default function Mision() {
                     MissionDetail={item.description}
                     misionId={item.id}
                     projectId={projectInfo._id}
-                    refresh={() => onRefresh()}
+                    refresh={() => handleGetData()}
+                    updateAction={() =>
+                      handleUpdateToWork(projectInfo._id, item.id)
+                    }
+                    onPressSnap={() => {
+                      handleSnapPress(0);
+                    }}
                   />
                 );
               } else {
@@ -162,31 +240,65 @@ export default function Mision() {
           flexDirection: "row",
         }}
       >
-        <FAB
-          placement="right"
-          visible={FABvisibility}
-          style={{ bottom: 60 }}
-          icon={{ name: "delete", color: "white" }}
-          color="red"
-          onPress={() => toggleModal()}
-        />
-        <FAB
-          placement="right"
-          visible={FABvisibility}
-          icon={{ name: "edit", color: "white" }}
-          color="green"
-          onPress={() => console.log(projectInfo._id)}
-        />
+        {projectInfo.isProjectClose === true ? (
+          <FAB
+            placement="right"
+            visible={state.FABvisibility}
+            style={{ bottom: 60 }}
+            icon={{ name: "delete", color: "white" }}
+            color="red"
+            onPress={() => toggleModal()}
+          />
+        ) : null}
+        {projectInfo.isProjectClose === true ? (
+          <FAB
+            placement="right"
+            visible={state.FABvisibility}
+            icon={{ name: "play", color: "white", type: "ionicon" }}
+            color="green"
+            onPress={() => toggleModalStart()}
+          />
+        ) : (
+          <FAB
+            placement="right"
+            visible={state.FABvisibility}
+            style={{ bottom: 60 }}
+            icon={{ name: "stop", color: "white" }}
+            color="orange"
+            onPress={() => toggleModalStop()}
+          />
+        )}
+        {projectInfo.isProjectClose === true ? null : (
+          <FAB
+            placement="right"
+            visible={state.FABvisibility}
+            icon={{ name: "edit", color: "white" }}
+            color="green"
+            onPress={() => console.log(projectInfo._id)}
+          />
+        )}
       </View>
       <AlertModal
+        title={"¿Estas seguro de eliminar el projecto?"}
         isModalVisible={isModalVisible}
         back={() => toggleModal()}
         handleDelete={() => handleDelete()}
       />
+      <AlertModal
+        title={"¿Estas seguro de detener el projecto?"}
+        isModalVisible={isModalVisibleStop}
+        back={() => toggleModalStop()}
+        handleDelete={() => handleCloseProject()}
+      />
+      <AlertModal
+        title={"¿Estas seguro de continuar el projecto?"}
+        isModalVisible={isModalVisibleStart}
+        back={() => toggleModalStart()}
+        handleDelete={() => handleStartProject()}
+      />
       <BottomSheet
-        enablePanDownToClose={true}
         index={-1}
-        initialPosition={0} // Lo establecemos en 0 para que esté en la parte inferior
+        enablePanDownToClose={true}
         snapPoints={snapPoints} // Puedes ajustar los puntos de anclaje según tus necesidades
         ref={bottomSheetRef}
       >
@@ -203,7 +315,13 @@ export default function Mision() {
           <Text style={{ margin: 15 }}>{itemDescription}</Text>
           <View style={{ marginTop: 15 }}>
             <View style={{ flexDirection: "row" }}>
-              <CustomButton tittle={"Marcar Trabajando"} />
+              <CustomButton
+                tittle={"Marcar Trabajando"}
+                onPress={() => {
+                  handleSnapPress(0);
+                  handleGetData();
+                }}
+              />
               <CustomButton tittle={"Marcar Completado"} />
             </View>
           </View>

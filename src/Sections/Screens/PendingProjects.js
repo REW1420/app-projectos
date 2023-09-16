@@ -14,9 +14,12 @@ import CustomSearchbar from "../../components/elements/Particles/CustomSearchbar
 import ItemCard from "../../components/elements/Cards/ItemCard";
 import ProjectController from "../../utils/Networking/ProjectController";
 import ItemShimer from "../../components/elements/Shimers/ItemShimer";
+import { useNavigation } from "@react-navigation/native";
 
 const ProjecNetworking = new ProjectController();
 export default function PendingProjects() {
+  const navigation = useNavigation();
+
   const [isLoading, setIsLoading] = useState(false);
 
   const [data2, setData2] = useState([]);
@@ -69,7 +72,18 @@ export default function PendingProjects() {
         />
         {isLoading ? (
           filteredData.length > 0 ? (
-            filteredData.map((item, i) => <ItemCard key={i} item={item} />)
+            filteredData.map((item, i) => (
+              <ItemCard
+                key={i}
+                item={item}
+                navigateFuntion={() => {
+                  navigation.navigate("Mision", {
+                    projectInfo: item,
+                  });
+                  handleGetData();
+                }}
+              />
+            ))
           ) : notFoundItem === true ? (
             <View
               style={{
@@ -84,7 +98,18 @@ export default function PendingProjects() {
               </Text>
             </View>
           ) : (
-            data2.map((item, i) => <ItemCard item={item} key={i} />)
+            data2.map((item, i) => (
+              <ItemCard
+                item={item}
+                key={i}
+                navigateFuntion={() => {
+                  navigation.navigate("Mision", {
+                    projectInfo: item,
+                  });
+                  handleGetData();
+                }}
+              />
+            ))
           )
         ) : (
           <ItemShimer />

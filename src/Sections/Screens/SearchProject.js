@@ -5,8 +5,12 @@ import COLORS from "../../utils/COLORS";
 import ItemCard from "../../components/elements/Cards/ItemCard";
 import ProjectController from "../../utils/Networking/ProjectController";
 import ItemShimer from "../../components/elements/Shimers/ItemShimer";
+import { useNavigation } from "@react-navigation/native";
+
 const ProjectNetworking = new ProjectController();
 export default function SearchProject() {
+  const navigation = useNavigation();
+
   const [isLoading, setIsLoading] = useState(false);
 
   const [data2, setData2] = useState([]);
@@ -52,7 +56,18 @@ export default function SearchProject() {
         />
         {isLoading ? (
           filteredData.length > 0 ? (
-            filteredData.map((item, i) => <ItemCard key={i} item={item} />)
+            filteredData.map((item, i) => (
+              <ItemCard
+                key={i}
+                item={item}
+                navigateFuntion={() => {
+                  navigation.navigate("Mision", {
+                    projectInfo: item,
+                  });
+                  fetchData();
+                }}
+              />
+            ))
           ) : notFoundItem === true ? (
             <View
               style={{
@@ -61,14 +76,24 @@ export default function SearchProject() {
                 alignItems: "center",
                 marginTop: 25,
               }}
-             
             >
               <Text style={{ fontSize: 20, textAlign: "center" }}>
                 Ups, No se encontraron resultados
               </Text>
             </View>
           ) : (
-            data2.map((item, i) => <ItemCard item={item} key={i} />)
+            data2.map((item, i) => (
+              <ItemCard
+                item={item}
+                key={i}
+                navigateFuntion={() => {
+                  navigation.navigate("Mision", {
+                    projectInfo: item,
+                  });
+                  fetchData();
+                }}
+              />
+            ))
           )
         ) : (
           <ItemShimer />

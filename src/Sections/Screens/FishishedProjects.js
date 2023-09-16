@@ -16,8 +16,12 @@ import ItemCard from "../../components/elements/Cards/ItemCard";
 import ItemShimer from "../../components/elements/Shimers/ItemShimer";
 import ProjectController from "../../utils/Networking/ProjectController";
 const ProjecNetworking = new ProjectController();
+import { useNavigation } from "@react-navigation/native";
+
 // create a component
 export default function FishishedProjects() {
+  const navigation = useNavigation();
+
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -40,7 +44,7 @@ export default function FishishedProjects() {
     }
   };
   const handleGetData = async () => {
-    const projects = await ProjecNetworking.getCloseProject("user2");
+    const projects = await ProjecNetworking.getCloseProject("user1");
     setData2(projects);
     console.log(projects);
     setIsLoading(true);
@@ -70,10 +74,21 @@ export default function FishishedProjects() {
           query={query}
         />
 
-        {data2.length === 1 ? (
+        {data2.length >= 1 ? (
           isLoading ? (
             filteredData.length > 0 ? (
-              filteredData.map((item, i) => <ItemCard key={i} item={item} />)
+              filteredData.map((item, i) => (
+                <ItemCard
+                  key={i}
+                  item={item}
+                  navigateFuntion={() => {
+                    navigation.navigate("Mision", {
+                      projectInfo: item,
+                    });
+                    handleGetData();
+                  }}
+                />
+              ))
             ) : notFoundItem === true ? (
               <View
                 style={{
@@ -88,7 +103,18 @@ export default function FishishedProjects() {
                 </Text>
               </View>
             ) : (
-              data2.map((item, i) => <ItemCard item={item} key={i} />)
+              data2.map((item, i) => (
+                <ItemCard
+                  item={item}
+                  key={i}
+                  navigateFuntion={() => {
+                    navigation.navigate("Mision", {
+                      projectInfo: item,
+                    });
+                    handleGetData();
+                  }}
+                />
+              ))
             )
           ) : (
             <ItemShimer />

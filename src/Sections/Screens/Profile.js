@@ -18,6 +18,7 @@ import COLORS from "../../utils/COLORS";
 import Icon from "react-native-vector-icons/Ionicons";
 import SingleItemCard from "../../components/elements/Cards/SingleItemCard";
 import ProfileItemCard from "../../components/elements/Cards/ProfileItemCard";
+import { Button } from "react-native";
 // create a component
 export default function Profile() {
   const height = Dimensions.get("screen").height;

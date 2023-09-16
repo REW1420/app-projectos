@@ -15,7 +15,7 @@ import AppContext from "../../../utils/context/AppContext";
 
 const NewProjectCard = ({ percentage, projectName, total, missingTotal }) => {
   //app context
-  const { setProyectTitle } = React.useContext(AppContext);
+  const { dispatch } = React.useContext(AppContext);
   const [title, setTitle] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState("");
@@ -42,7 +42,8 @@ const NewProjectCard = ({ percentage, projectName, total, missingTotal }) => {
   );
   const handleChangeText = (newText) => {
     setTitle(newText);
-    setProyectTitle(newText);
+
+    dispatch({ type: "SET_PROJECT_TITLE", payload: newText });
   };
   return (
     <>

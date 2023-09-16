@@ -5,16 +5,14 @@ import ProgressBar from "../Particles/ProgressBar";
 import ShimmerPlaceholder from "react-native-shimmer-placeholder";
 
 import { useNavigation } from "@react-navigation/native";
-export default function ItemCard({ item }) {
+export default function ItemCard({ item, navigateFuntion }) {
   const navigation = useNavigation();
   return (
     <Pressable
       style={{ marginBottom: 10 }}
-      onPress={() =>
-        navigation.navigate("Mision", {
-          projectInfo: item,
-        })
-      }
+      onPress={() => {
+        navigateFuntion();
+      }}
     >
       <View style={{ backgroundColor: "white", borderRadius: 15 }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
