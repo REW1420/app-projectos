@@ -9,6 +9,8 @@ export const AppProvider = ({ children }) => {
     FABvisibility: false,
     isOwner: false,
     projectInData: [],
+    newMisionData: [],
+    newProjectTitle: "",
   };
   const appReducer = (state, action) => {
     switch (action.type) {
@@ -20,7 +22,10 @@ export const AppProvider = ({ children }) => {
         return { ...state, FABvisibility: action.payload };
       case "SET_IS_OWNER":
         return { ...state, isOwner: action.payload };
-
+      case "SET_NEW_PROJECT_DATA":
+        return { ...state, newMisionData: action.payload };
+      case "SET_NEW_PROJECT_TITLE":
+        return { ...state, newProjectTitle: action.payload };
       default:
         return state;
     }

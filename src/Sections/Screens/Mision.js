@@ -274,7 +274,11 @@ export default function Mision() {
             visible={state.FABvisibility}
             icon={{ name: "edit", color: "white" }}
             color="green"
-            onPress={() => console.log(projectInfo._id)}
+            onPress={() => {
+              navigation.navigate("editProject", {
+                projectInfo: projectInfo,
+              });
+            }}
           />
         )}
       </View>
@@ -299,7 +303,7 @@ export default function Mision() {
       <BottomSheet
         index={-1}
         enablePanDownToClose={true}
-        snapPoints={snapPoints} // Puedes ajustar los puntos de anclaje según tus necesidades
+        snapPoints={snapPoints}
         ref={bottomSheetRef}
       >
         <BottomSheetView>

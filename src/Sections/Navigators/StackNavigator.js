@@ -12,6 +12,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import AddProject from "../Screens/AddProject";
 import AppContext from "../../utils/context/AppContext";
 import ProjectController from "../../utils/Networking/ProjectController";
+import EditProject from "../Screens/EditProject";
 const ProjectNetworking = new ProjectController();
 const Stack = createStackNavigator();
 export default function StackNavigator() {
@@ -79,7 +80,7 @@ export default function StackNavigator() {
           headerRight: () => (
             <Pressable
               onPress={() => {
-                console.log("a");
+                ProjectNetworking.createProject(data);
               }}
               style={{ marginRight: 15 }}
             >
@@ -87,6 +88,26 @@ export default function StackNavigator() {
                 style={{ color: "#2B5664", fontSize: 15, fontWeight: "400" }}
               >
                 Guardar
+              </Text>
+            </Pressable>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="editProject"
+        component={EditProject}
+        options={{
+          headerRight: () => (
+            <Pressable
+              onPress={() => {
+                console.log(state.newProjectTitle, 'datos',state.newMisionData);
+              }}
+              style={{ marginRight: 15 }}
+            >
+              <Text
+                style={{ color: "#2B5664", fontSize: 15, fontWeight: "400" }}
+              >
+                Actualizar
               </Text>
             </Pressable>
           ),

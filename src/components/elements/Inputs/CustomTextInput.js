@@ -4,9 +4,9 @@ import COLORS from "../../../utils/COLORS";
 export default function CustomTextInput({
   placeholder,
   secureTextEntry,
-  onChangeText, //handles to catch the value from here
+  onChangeText,
 }) {
-  const [inputValue, setInputValue] = useState(""); // hook for the input value
+  const [inputValue, setInputValue] = useState(''); // hook for the input value
 
   const handleTextChange = (text) => {
     setInputValue(text); //update the hook
