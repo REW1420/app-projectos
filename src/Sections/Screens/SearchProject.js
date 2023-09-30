@@ -16,7 +16,7 @@ export default function SearchProject() {
   const [data2, setData2] = useState([]);
   const fetchData = async () => {
     try {
-      const projects = await ProjectNetworking.getProjectImNotIn("user3");
+      const projects = await ProjectNetworking.getProjectImNotIn("user1");
       setData2(projects);
       setIsLoading(true);
     } catch (error) {

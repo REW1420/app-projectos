@@ -18,14 +18,50 @@ import COLORS from "../../utils/COLORS";
 import Icon from "react-native-vector-icons/Ionicons";
 import SingleItemCard from "../../components/elements/Cards/SingleItemCard";
 import ProfileItemCard from "../../components/elements/Cards/ProfileItemCard";
-import { Button } from "react-native";
+import AppContext from "../../utils/context/AppContext";
+import { useFocusEffect } from "@react-navigation/native";
+
+import UserController from "../../utils/Networking/UserController";
+const userNetworking = new UserController();
+
 // create a component
 export default function Profile() {
   const height = Dimensions.get("screen").height;
+  const { state, dispatch } = React.useContext(AppContext);
+  const [userInfo, setUserInfo] = React.useState(state.userInfo._j);
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const onRefresh = async () => {
+    setIsRefreshing(true);
+    const data = await userNetworking.getUserInfo(userInfo._id);
+    setUserInfo(data);
+
+    setIsRefreshing(false);
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Esta función se ejecutará cuando esta pantalla obtenga el foco.
+
+      onRefresh();
+      //  setUserInfo(data);
+      return () => {
+        // Esta función se ejecutará cuando se deje esta pantalla.
+        console.log("Pantalla deenfocada");
+      };
+    }, [])
+  );
 
   return (
     <>
-      <ScrollView style={{ backgroundColor: COLORS.primary_backgroud }}>
+      <ScrollView
+        style={{ backgroundColor: COLORS.primary_backgroud }}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={() => onRefresh()}
+          />
+        }
+      >
         <View style={styles.secondary_backgroud}>
           <View
             style={{
@@ -56,7 +92,7 @@ export default function Profile() {
               alignSelf: "center",
               bottom: height / 12,
             }}
-            source={require("../../../assets/ProfilePhoto/JH.jpg")}
+            source={{ uri: userInfo.profilePhoto }}
           />
 
           <View
@@ -67,9 +103,7 @@ export default function Profile() {
               top: -50,
             }}
           >
-            <Text style={{ fontSize: 20 }}>
-              William Ernesto Ramos Valladares
-            </Text>
+            <Text style={{ fontSize: 20 }}>{userInfo.name}</Text>
             <Text style={{ fontSize: 20 }}>Programador JR</Text>
           </View>
         </View>

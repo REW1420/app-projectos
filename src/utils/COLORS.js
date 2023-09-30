@@ -8,4 +8,5 @@ export default {
   button_text: "#FFFFFF",
   inactive_icon: "#628C72",
   active_icon: "#263138",
+  inputBorderColor: "black",
 };

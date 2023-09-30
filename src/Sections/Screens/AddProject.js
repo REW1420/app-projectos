@@ -110,7 +110,7 @@ export default function AddProject() {
       {inputs}
 
       <View style={{ marginBottom: 20 }}>
-        <CustomButton onPress={addInput} tittle={"Agregar nueva mision"} />
+        <CustomButton onPress={addInput} title={"Agregar nueva mision"} />
       </View>
     </ScrollView>
   );

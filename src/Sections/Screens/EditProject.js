@@ -18,17 +18,24 @@ export default function EditProject() {
   const route = useRoute();
   const projectInfo = route.params?.projectInfo;
 
-  const [numInputs, setNumInputs] = useState(1);
+  const [numInputs, setNumInputs] = useState(projectInfo.mision.length);
   const [textValue, setTextValue] = useState("");
   const refInputs = useRef([textValue]);
   const initialMisionValues = projectInfo.mision;
   const { dispatch } = useContext(AppContext);
 
   const [tmpMisionData, setTempMisionData] = useState({
-    mision: [{}],
+    mision: projectInfo.mision,
   });
+
+  React.useEffect(() => {
+    dispatch({ type: "SET_NEW_PROJECT_DATA", payload: initialMisionValues });
+    dispatch({ type: "SET_PROJECT_ID", payload: projectInfo._id });
+  }, []);
   const inputs = [];
   for (let i = 0; i < numInputs; i++) {
+    misionValues = initialMisionValues[i];
+
     inputs.push(
       <React.Fragment key={i + 1}>
         <View
@@ -52,6 +59,7 @@ export default function EditProject() {
           <CustomTextInput
             onChangeText={(value) => setInputValue(i, value, "misionName")}
             placeholder={"Titulo"}
+            value={misionValues.misionName}
           />
         </View>
         <View
@@ -64,6 +72,7 @@ export default function EditProject() {
           <CustomTextInput
             onChangeText={(value) => setInputValue(i, value, "description")}
             placeholder={"Descripcion"}
+            value={misionValues.description}
           />
         </View>
       </React.Fragment>
@@ -88,12 +97,8 @@ export default function EditProject() {
       status: "Pendiente",
       [field]: value,
     };
-    //dispatch({ type: "SET_MISION_DATA", payload: updateData });
-
-    const newJSON = initialMisionValues;
-    newJSON.mision = [...newJSON.mision, ...updateData];
-    console.log(newJSON);
-
+    dispatch({ type: "SET_NEW_PROJECT_DATA", payload: updateData });
+    console.log(updateData);
     setTextValue(value);
   };
   const addInput = () => {
@@ -105,7 +110,7 @@ export default function EditProject() {
   const removeInput = (i) => {
     const updateData = { ...tmpMisionData };
     updateData.mision.pop();
-    //dispatch({ type: "SET_NEW_PROJECT_DATA", payload: updateData });
+    dispatch({ type: "SET_NEW_PROJECT_DATA", payload: updateData });
     // Eliminar del array por valor de índice
     refInputs.current.splice(i, 1);
     // Disminuir el número de entradas
@@ -122,9 +127,6 @@ export default function EditProject() {
         />
       </View>
       {inputs}
-      <View style={{ marginBottom: 20 }}>
-        <CustomButton onPress={addInput} tittle={"Agregar nueva mision"} />
-      </View>
     </ScrollView>
   );
 }

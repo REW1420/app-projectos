@@ -11,7 +11,13 @@ export const AppProvider = ({ children }) => {
     projectInData: [],
     newMisionData: [],
     newProjectTitle: "",
+    isInTeam: false,
+    projectID: "",
+    userID: "",
+    userInfo: {},
+    innerUserInfo: {},
   };
+
   const appReducer = (state, action) => {
     switch (action.type) {
       case "SET_MISION_DATA":
@@ -26,6 +32,17 @@ export const AppProvider = ({ children }) => {
         return { ...state, newMisionData: action.payload };
       case "SET_NEW_PROJECT_TITLE":
         return { ...state, newProjectTitle: action.payload };
+      case "SET_IS_IN_TEAM":
+        return { ...state, isInTeam: action.payload };
+      case "SET_PROJECT_ID":
+        return { ...state, projectID: action.payload };
+      case "SET_USER_ID":
+        return { ...state, userID: action.payload };
+      case "SET_USER_INFO":
+        return { ...state, userInfo: action.payload };
+      case "SET_INNER_USER_INFO":
+        return { ...state, innerUserInfo: action.payload };
+
       default:
         return state;
     }

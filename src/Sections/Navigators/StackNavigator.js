@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, Pressable } from "react-native";
+import { Text, Pressable, Button } from "react-native";
 import "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import Login from "../Screens/Login";
@@ -19,10 +19,15 @@ export default function StackNavigator() {
   const { state, dispatch } = React.useContext(AppContext);
   const data = {
     projectName: state.projectTitle,
-
     team: [{ id: "user2" }, { id: "user3" }],
     projectOwner: "user2",
     ...state.misionData,
+  };
+  const newData = {
+    projectName: state.newProjectTitle,
+    team: [{ id: "user2" }, { id: "user3" }],
+    projectOwner: "user2",
+    ...state.newMisionData,
   };
   return (
     <Stack.Navigator initialRouteName="login">
@@ -41,9 +46,9 @@ export default function StackNavigator() {
         component={Mision}
         options={{
           headerTitle: "",
-          headerRight: () =>
-            state.isOwner ? (
-              state.FABvisibility === false ? (
+          headerRight: () => {
+            if (state.isOwner === true) {
+              return state.FABvisibility === false ? (
                 <Icon
                   style={{ marginRight: 20 }}
                   name="build-outline"
@@ -61,8 +66,28 @@ export default function StackNavigator() {
                     dispatch({ type: "SET_FAB_VISIBILITY", payload: false })
                   }
                 />
-              )
-            ) : null,
+              );
+            } else {
+              return state.isInTeam === false ? (
+                <Pressable
+                  onPress={() => {
+                    ProjectNetworking.updateJoinTeam(state.projectID, "user1");
+                  }}
+                  style={{ marginRight: 15 }}
+                >
+                  <Text
+                    style={{
+                      color: "#2B5664",
+                      fontSize: 15,
+                      fontWeight: "400",
+                    }}
+                  >
+                    Unirme
+                  </Text>
+                </Pressable>
+              ) : null;
+            }
+          },
         }}
       />
       <Stack.Screen
@@ -100,7 +125,7 @@ export default function StackNavigator() {
           headerRight: () => (
             <Pressable
               onPress={() => {
-                console.log(state.newProjectTitle, 'datos',state.newMisionData);
+                ProjectNetworking.updateProject(state.projectID, newData);
               }}
               style={{ marginRight: 15 }}
             >

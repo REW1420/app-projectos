@@ -58,6 +58,7 @@ export function WorkingSwipeableList({
   onPressSnap,
   refresh,
   updateAction,
+  updateToFinish,
 }) {
   return (
     <SafeAreaView>
@@ -83,7 +84,7 @@ export function WorkingSwipeableList({
             buttonStyle={{ minHeight: "110%", backgroundColor: "white" }}
           />
         )}
-        rightContent={() => (
+        rightContent={(reset) => (
           <View>
             <Button
               containerStyle={{
@@ -91,7 +92,11 @@ export function WorkingSwipeableList({
                 margin: 5,
                 justifyContent: "center",
               }}
-              //  onPress={Raction}
+              onPress={() => {
+                updateToFinish();
+                refresh();
+                reset();
+              }}
               icon={<Icon name="checkmark-outline" size={35} color={"green"} />}
               buttonStyle={{ minHeight: "110%", backgroundColor: "white" }}
             />

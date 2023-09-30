@@ -10,10 +10,20 @@ import { useNavigation } from "@react-navigation/native";
 import COLORS from "../../utils/COLORS";
 import CustomTextInput from "../../components/elements/Inputs/CustomTextInput";
 import CustomButton from "../../components/elements/Buttons/CustomButton";
+import AppContext from "../../utils/context/AppContext";
+import UserController from "../../utils/Networking/UserController";
+const userNetworking = new UserController();
 export default function Login() {
+  const { state, dispatch } = React.useContext(AppContext);
+
   const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
   const navigation = useNavigation();
+
+  async function handleGetUserInfo() {
+    const data = userNetworking.getUserInfo("6516094b91620132c9e11d81");
+    dispatch({ type: "SET_USER_INFO", payload: data });
+  }
   return (
     <ScrollView style={styles.initB}>
       <View style={styles.secondary_backgroud}></View>
@@ -53,8 +63,9 @@ export default function Login() {
           </TouchableOpacity>
         </View>
         <CustomButton
-          tittle={"Iniciar sesion"}
-          onPress={() => {
+          title={"Iniciar sesion"}
+          onPress={async () => {
+            await handleGetUserInfo();
             console.log("Fetch to db using", user, pwd);
             navigation.navigate("TabNav");
           }}

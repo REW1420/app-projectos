@@ -157,4 +157,66 @@ export default class ProjectController {
       throw error;
     }
   }
+
+  async updateJoinTeam(projectId, userId) {
+    try {
+      const response = await fetch(
+        BASE_URL + `projects/update-team/${projectId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            newMemberId: userId,
+          }),
+        }
+      );
+      if (!response.ok) {
+        throw Error("No se pudo actualizar el equipo");
+      }
+      const project = await response.json();
+      console.log(project);
+    } catch (error) {
+      console.error("Error en:", error);
+      throw error;
+    }
+  }
+
+  async updateProject(projectID, newData) {
+    try {
+      const response = await fetch(BASE_URL + `projects/update/${projectID}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+
+        body: JSON.stringify(newData),
+      });
+      if (!response.ok) {
+        throw Error("No se pudo actualizar el equipo");
+      }
+      const project = await response.json();
+      console.log(project);
+    } catch (error) {
+      console.error("Error en:", error);
+      throw error;
+    }
+  }
+
+  async updateAddNewMision(misionData, projectId) {
+    try {
+      const response = await fetch(
+        BASE_URL + `projects/add-mision/${projectId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(misionData),
+        }
+      );
+      const project = await response.json();
+      console.log(project);
+    } catch (error) {
+      console.error("Error en:", error);
+      throw error;
+    }
+  }
 }

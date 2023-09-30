@@ -13,11 +13,20 @@ import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
 import DatePicker, { getFormatedDate } from "react-native-modern-datepicker";
 import { Pressable } from "react-native";
+import CustomButton from "../../components/elements/Buttons/CustomButton";
+import AppContext from "../../utils/context/AppContext";
+import xhrGetBlob from "../../utils/Firebase/FirebaseFuntions";
+import UserController from "../../utils/Networking/UserController";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../../utils/Firebase/FirebaseConfig";
+const userNetworking = new UserController();
 
-const ProfileSetting = ({ navigation }) => {
-  const [name, setName] = useState("William Valladares");
-  const [email, setEmail] = useState("werramos@gmail.com");
-  const [password, setPassword] = useState("randompassword");
+const ProfileSetting = () => {
+  const { state, dispatch } = React.useContext(AppContext);
+  const userInfo = state.userInfo._j;
+  const [name, setName] = useState(userInfo.name);
+  const [email, setEmail] = useState(userInfo.email);
+  const [password, setPassword] = useState(userInfo.password);
 
   const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
   const today = new Date();
@@ -25,8 +34,8 @@ const ProfileSetting = ({ navigation }) => {
     today.setDate(today.getDate() + 1),
     "YYYY/MM/DD"
   );
-  const [selectedStartDate, setSelectedStartDate] = useState("01/01/1990");
-  const [startedDate, setStartedDate] = useState("12/12/2023");
+  const [selectedStartDate, setSelectedStartDate] = useState(userInfo.bornDate);
+  const [startedDate, setStartedDate] = useState(today.toString());
 
   const handleChangeStartDate = (propDate) => {
     setStartedDate(propDate);
@@ -35,7 +44,7 @@ const ProfileSetting = ({ navigation }) => {
   const handleOnPressStartDate = () => {
     setOpenStartDatePicker(!openStartDatePicker);
   };
-  const [selectedImage, setSelectedImage] = useState();
+  const [selectedImage, setSelectedImage] = useState(null);
   const handleImageSelection = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -44,12 +53,10 @@ const ProfileSetting = ({ navigation }) => {
       quality: 1,
     });
 
-    console.log(result);
-
-    if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri);
-    }
+    setSelectedImage(result.assets[0].uri);
+    console.log(selectedImage);
   };
+  const [profileURL, setProfileURL] = React.useState(userInfo.profilePhoto);
 
   function renderDatePicker() {
     return (
@@ -109,7 +116,78 @@ const ProfileSetting = ({ navigation }) => {
       </Modal>
     );
   }
+  async function handleUpdateUser() {
+    if (selectedImage !== null) {
+      try {
+        await uploadImage(selectedImage, userInfo._id);
 
+        // Aquí puedes realizar otras acciones con 'data'
+      } catch (error) {
+        console.error("Error al cargar la imagen:", error);
+        // Maneja el error de acuerdo a tus necesidades
+      }
+    } else {
+      userNetworking.updateUser(userInfo._id, data);
+    }
+  }
+
+  const data = {
+    id: userInfo.id,
+    name: name,
+    email: email,
+    password: password,
+    bornDate: selectedStartDate,
+    profilePhoto: profileURL,
+  };
+
+  async function uploadImage(uri, userName) {
+    const storageRef = ref(storage, `users/profilePhotos/${userName}`);
+    const metadata = {
+      contentType: "image/jpg",
+    };
+
+    let URL;
+    // Obtener el blob de la URL de manera sincrónica
+    const blob = await xhrGetBlob(uri);
+
+    //  console.log(blob);
+
+    // Subir el blob a Firebase Storage
+    const uploadTask = uploadBytes(storageRef, blob, metadata);
+
+    // Obtener la URL de descarga una vez que se haya completado la carga
+    await getDownloadURL((await uploadTask).ref)
+      .then((url) => {
+        // console.log("hola", url);
+        setProfileURL(url);
+      })
+      .then(() => {
+        userNetworking.updateUser(userInfo._id, data);
+        const data = userNetworking.getUserInfo(userInfo._id);
+        dispatch({ type: "SET_USER_INFO", payload: data });
+      })
+      .catch((error) => {
+        // A full list of error codes is available at
+        // https://firebase.google.com/docs/storage/web/handle-errors
+        switch (error.code) {
+          case "storage/object-not-found":
+            // File doesn't exist
+            break;
+          case "storage/unauthorized":
+            // User doesn't have permission to access the object
+            break;
+          case "storage/canceled":
+            // User canceled the upload
+            break;
+
+          // ...
+
+          case "storage/unknown":
+            // Unknown error occurred, inspect the server response
+            break;
+        }
+      });
+  }
   return (
     <SafeAreaView
       style={{
@@ -127,7 +205,12 @@ const ProfileSetting = ({ navigation }) => {
         >
           <TouchableOpacity onPress={handleImageSelection}>
             <Image
-              source={{ uri: selectedImage }}
+              source={{
+                uri:
+                  selectedImage === null
+                    ? userInfo.profilePhoto
+                    : selectedImage,
+              }}
               style={{
                 height: 170,
                 width: 170,
@@ -258,23 +341,11 @@ const ProfileSetting = ({ navigation }) => {
           </View>
         </View>
 
-        <TouchableOpacity
-          style={{
-            backgroundColor: "black",
-            height: 44,
-            borderRadius: 6,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text
-            style={{
-              color: "white",
-            }}
-          >
-            Actualizar
-          </Text>
-        </TouchableOpacity>
+        <CustomButton
+          title={"Actualizar"}
+          key={0}
+          onPress={async () => handleUpdateUser()}
+        />
 
         {renderDatePicker()}
       </ScrollView>

@@ -5,8 +5,9 @@ export default function CustomTextInput({
   placeholder,
   secureTextEntry,
   onChangeText,
+  value,
 }) {
-  const [inputValue, setInputValue] = useState(''); // hook for the input value
+  const [inputValue, setInputValue] = useState(value); // hook for the input value
 
   const handleTextChange = (text) => {
     setInputValue(text); //update the hook
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
     width: "80%",
     color: COLORS.text_color,
     textAlign: "center",
-    borderColor: COLORS.input_background,
+    borderColor: COLORS.inputBorderColor,
     alignSelf: "center",
   },
 

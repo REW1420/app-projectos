@@ -11,6 +11,7 @@ import { FAB } from "@rneui/themed";
 import { FishishedListItem } from "../../components/elements/Particles/CustomListItem";
 import CustomButton from "../../components/elements/Buttons/CustomButton";
 import AppContext from "../../utils/context/AppContext";
+import NewMisionModal from "../../components/elements/Modals/NewMisionModal";
 import AlertModal from "../../components/elements/Modals/AlertModal";
 import ProjectController from "../../utils/Networking/ProjectController";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -48,6 +49,9 @@ export default function Mision() {
   React.useEffect(() => {
     handleGetData();
     handleSetOwnerShip();
+    handleIsInTeam();
+    dispatch({ type: "SET_PROJECT_ID", payload: projectInfo._id });
+
     const misionesTerminadas = projectInfo.mision.filter(
       (mision) => mision.isFinished === true
     );
@@ -58,9 +62,14 @@ export default function Mision() {
   const handleSetOwnerShip = () => {
     if (projectInfo.projectOwner === "user1") {
       dispatch({ type: "SET_IS_OWNER", payload: true });
+      console.log(true);
     } else {
       dispatch({ type: "SET_IS_OWNER", payload: false });
+      console.log(false);
     }
+  };
+  const handleIsInTeam = () => {
+    dispatch({ type: "SET_IS_IN_TEAM", payload: projectInfo.isMemberInTeam });
   };
   const [isModalVisible, setModalVisible] = React.useState(false);
   const [isModalVisibleStop, setModalVisibleStop] = React.useState(false);
@@ -93,6 +102,8 @@ export default function Mision() {
   const [refreshing, setRefreshing] = React.useState(false);
   const handleGetData = async () => {
     const res = await ProjecNetworking.getSingleProjectInfo(projectInfo._id);
+
+    setMisionId(res.lastMissionId);
     setProjectInfo(res);
     console.log(res);
   };
@@ -140,6 +151,11 @@ export default function Mision() {
     toggleModal();
     navigation.navigate("Proyectos");
   };
+
+  const [isNewModalVisible, setIsNewModalVisible] = React.useState(false);
+  const toggleNewModal = () => {
+    setIsNewModalVisible(!isNewModalVisible);
+  };
   return (
     <React.Fragment>
       <ScrollView
@@ -179,6 +195,9 @@ export default function Mision() {
                   updateAction={() =>
                     handleUpdateToPending(projectInfo._id, item.id)
                   }
+                  updateToFinish={() => {
+                    handleUpdateToFinished(projectInfo._id, item.id);
+                  }}
                 />
               );
             }
@@ -269,17 +288,29 @@ export default function Mision() {
           />
         )}
         {projectInfo.isProjectClose === true ? null : (
-          <FAB
-            placement="right"
-            visible={state.FABvisibility}
-            icon={{ name: "edit", color: "white" }}
-            color="green"
-            onPress={() => {
-              navigation.navigate("editProject", {
-                projectInfo: projectInfo,
-              });
-            }}
-          />
+          <>
+            <FAB
+              placement="right"
+              visible={state.FABvisibility}
+              icon={{ name: "edit", color: "white" }}
+              color="green"
+              onPress={() => {
+                navigation.navigate("editProject", {
+                  projectInfo: projectInfo,
+                });
+              }}
+            />
+            <FAB
+              placement="right"
+              visible={state.FABvisibility}
+              icon={{ name: "add", color: "white" }}
+              color="green"
+              style={{ bottom: 120 }}
+              onPress={() => {
+                toggleNewModal();
+              }}
+            />
+          </>
         )}
       </View>
       <AlertModal
@@ -299,6 +330,13 @@ export default function Mision() {
         isModalVisible={isModalVisibleStart}
         back={() => toggleModalStart()}
         handleDelete={() => handleStartProject()}
+      />
+      <NewMisionModal
+        title={"Agregar nueva mision"}
+        isModalVisible={isNewModalVisible}
+        back={() => toggleNewModal()}
+        id={projectInfo.lastMissionId}
+        projectID={projectInfo._id}
       />
       <BottomSheet
         index={-1}
@@ -320,13 +358,13 @@ export default function Mision() {
           <View style={{ marginTop: 15 }}>
             <View style={{ flexDirection: "row" }}>
               <CustomButton
-                tittle={"Marcar Trabajando"}
+                title={"Marcar Trabajando"}
                 onPress={() => {
                   handleSnapPress(0);
                   handleGetData();
                 }}
               />
-              <CustomButton tittle={"Marcar Completado"} />
+              <CustomButton title={"Marcar Completado"} />
             </View>
           </View>
         </BottomSheetView>
