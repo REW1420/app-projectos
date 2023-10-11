@@ -120,7 +120,10 @@ export default function BottomTabNavigator() {
                 style={{
                   marginRight: 15,
                 }}
-                onPress={() => navigation.navigate("ProfileSetting")}
+                onPress={() => {
+                  navigation.navigate("ProfileSetting");
+                  
+                }}
               />
               <Icon
                 name="log-out-outline"
@@ -129,7 +132,7 @@ export default function BottomTabNavigator() {
                 style={{
                   marginRight: 15,
                 }}
-                onPress={() => console.log("News")}
+                onPress={() => navigation.navigate("Login")}
               />
             </View>
           ),

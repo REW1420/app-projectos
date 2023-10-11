@@ -1,10 +1,13 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import COLORS from "../../../utils/COLORS";
-export default function CustomButton({ title, onPress }) {
+export default function CustomButton({ title, onPress, width }) {
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.button} onPress={onPress}>
+      <TouchableOpacity
+        style={{ width: width, ...styles.button }}
+        onPress={onPress}
+      >
         <Text style={styles.button_text}>{title}</Text>
       </TouchableOpacity>
     </View>
@@ -13,9 +16,9 @@ export default function CustomButton({ title, onPress }) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    marginHorizontal: 10,
   },
   button: {
     backgroundColor: "#413B57",
@@ -28,7 +31,6 @@ const styles = StyleSheet.create({
     padding: 10,
     justifyContent: "center",
     alignItems: "center",
-    width: "80%",
   },
   button_text: {
     color: COLORS.button_text,

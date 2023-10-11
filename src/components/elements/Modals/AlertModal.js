@@ -36,8 +36,8 @@ export default function AlertModal({
         </View>
 
         <View style={{ flexDirection: "row" }}>
-          <CustomButton tittle={"Cancelar"} onPress={back} />
-          <CustomButton tittle={"Aceptar"} onPress={handleDelete} />
+          <CustomButton title={"Cancelar"} onPress={back} />
+          <CustomButton title={"Aceptar"} onPress={handleDelete} />
         </View>
       </View>
     </Modal>

@@ -19,7 +19,7 @@ const ProjecNetworking = new ProjectController();
 
 export default function Mision() {
   const navigation = useNavigation();
-
+  const [showFinishedOptions, setShowFinishedOptions] = React.useState(false);
   useFocusEffect(
     React.useCallback(() => {
       // Esta función se ejecutará cuando esta pantalla obtenga el foco.
@@ -51,6 +51,7 @@ export default function Mision() {
     handleSetOwnerShip();
     handleIsInTeam();
     dispatch({ type: "SET_PROJECT_ID", payload: projectInfo._id });
+    dispatch({ type: "SET_IS_IN_TEAM", payload: projectInfo.isMemberInTeam });
 
     const misionesTerminadas = projectInfo.mision.filter(
       (mision) => mision.isFinished === true
@@ -59,17 +60,16 @@ export default function Mision() {
     setTotal(misionesTotal);
     setTotalFinished(misionesTerminadas.length);
   }, []);
+
   const handleSetOwnerShip = () => {
-    if (projectInfo.projectOwner === "user1") {
+    if (projectInfo.projectOwner === state.userID) {
       dispatch({ type: "SET_IS_OWNER", payload: true });
-      console.log(true);
     } else {
       dispatch({ type: "SET_IS_OWNER", payload: false });
-      console.log(false);
     }
   };
   const handleIsInTeam = () => {
-    dispatch({ type: "SET_IS_IN_TEAM", payload: projectInfo.isMemberInTeam });
+    console.log(projectInfo.isMemberInTeam);
   };
   const [isModalVisible, setModalVisible] = React.useState(false);
   const [isModalVisibleStop, setModalVisibleStop] = React.useState(false);
@@ -101,7 +101,10 @@ export default function Mision() {
   };
   const [refreshing, setRefreshing] = React.useState(false);
   const handleGetData = async () => {
-    const res = await ProjecNetworking.getSingleProjectInfo(projectInfo._id);
+    const res = await ProjecNetworking.getSingleProjectInfo(
+      projectInfo._id,
+      state.userID
+    );
 
     setMisionId(res.lastMissionId);
     setProjectInfo(res);
@@ -110,6 +113,7 @@ export default function Mision() {
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     handleGetData();
+    handleIsInTeam();
     setRefreshing(false);
   }, []);
   const [misionId, setMisionId] = React.useState("");
@@ -156,6 +160,12 @@ export default function Mision() {
   const toggleNewModal = () => {
     setIsNewModalVisible(!isNewModalVisible);
   };
+
+  const handleLeaveProject = async () => {
+    await ProjecNetworking.leaveProject(projectInfo._id, state.userID).finally(
+      () => navigation.navigate("TabNav")
+    );
+  };
   return (
     <React.Fragment>
       <ScrollView
@@ -178,31 +188,44 @@ export default function Mision() {
             total={total}
             missingTotal={totalFinished}
             daysLeft={projectInfo.daysLeft}
+            key={0}
           />
           <View style={styles.textContainerRigth}>
             <Text style={styles.hint_text}>Trabajando</Text>
           </View>
-          {projectInfo.mision.map((item, index) => {
-            if (item.status === "Trabajando") {
-              return (
-                <WorkingSwipeableList
-                  key={index}
-                  tittle={item.misionName}
-                  status={item.status}
-                  misionId={item.id}
-                  projectId={projectInfo._id}
-                  refresh={() => handleGetData()}
-                  updateAction={() =>
-                    handleUpdateToPending(projectInfo._id, item.id)
-                  }
-                  updateToFinish={() => {
-                    handleUpdateToFinished(projectInfo._id, item.id);
-                  }}
-                />
-              );
-            }
-          })}
 
+          {projectInfo.mision.every((item) => item.isFinished === true) ? (
+            <View>
+              <Text>Nada</Text>
+            </View>
+          ) : (
+            projectInfo.mision.map((item, index) => {
+              if (item.status === "Trabajando") {
+                return (
+                  <WorkingSwipeableList
+                    key={index}
+                    tittle={item.misionName}
+                    status={item.status}
+                    misionId={item.id}
+                    projectId={projectInfo._id}
+                    refresh={() => handleGetData()}
+                    updateAction={() =>
+                      handleUpdateToPending(projectInfo._id, item.id)
+                    }
+                    updateToFinish={() => {
+                      handleUpdateToFinished(projectInfo._id, item.id);
+                    }}
+                    onPressSnap={() => {
+                      handleSnapPress(0);
+                      setItemDescription(item.description);
+                    }}
+                  />
+                );
+              } else {
+                return null;
+              }
+            })
+          )}
           <View style={styles.textContainerRigth}>
             <Text style={styles.hint_text}>Pendientes</Text>
           </View>
@@ -225,6 +248,8 @@ export default function Mision() {
                     }
                     onPressSnap={() => {
                       handleSnapPress(0);
+                      setItemDescription(item.description);
+                      setShowFinishedOptions(false);
                     }}
                   />
                 );
@@ -243,9 +268,19 @@ export default function Mision() {
           ) : (
             projectInfo.mision.map((item, index) => {
               if (item.isFinished === true) {
-                return <FishishedListItem key={index} mision={item} />;
+                return (
+                  <FishishedListItem
+                    key={index}
+                    mision={item}
+                    onPressAction={() => {
+                      handleSnapPress(0);
+                      setItemDescription(item.description);
+                      setShowFinishedOptions(true);
+                    }}
+                  />
+                );
               } else {
-                return null; // Devuelve null en lugar de "Nada" si no quieres renderizar nada
+                return null;
               }
             })
           )}
@@ -331,6 +366,19 @@ export default function Mision() {
         back={() => toggleModalStart()}
         handleDelete={() => handleStartProject()}
       />
+      <AlertModal
+        title={"¿Esta seguro de dejar el proyecto?"}
+        isModalVisible={state.alerModalVisibility}
+        back={() => {
+          dispatch({
+            type: "SET_ALERTMODAL_VISIBILITY",
+            payload: false,
+          });
+        }}
+        handleDelete={() => {
+          handleLeaveProject();
+        }}
+      />
       <NewMisionModal
         title={"Agregar nueva mision"}
         isModalVisible={isNewModalVisible}
@@ -356,16 +404,34 @@ export default function Mision() {
           </View>
           <Text style={{ margin: 15 }}>{itemDescription}</Text>
           <View style={{ marginTop: 15 }}>
-            <View style={{ flexDirection: "row" }}>
-              <CustomButton
-                title={"Marcar Trabajando"}
-                onPress={() => {
-                  handleSnapPress(0);
-                  handleGetData();
+            {showFinishedOptions === true ? (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
-              />
-              <CustomButton title={"Marcar Completado"} />
-            </View>
+              >
+                <CustomButton title={"Desmarcar completado"} />
+              </View>
+            ) : (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <CustomButton
+                  title={"Marcar Trabajando"}
+                  onPress={() => {
+                    handleSnapPress(0);
+                    handleGetData();
+                  }}
+                />
+                <CustomButton title={"Marcar Completado"} />
+              </View>
+            )}
           </View>
         </BottomSheetView>
       </BottomSheet>

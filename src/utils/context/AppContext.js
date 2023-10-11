@@ -16,6 +16,7 @@ export const AppProvider = ({ children }) => {
     userID: "",
     userInfo: {},
     innerUserInfo: {},
+    alerModalVisibility: false,
   };
 
   const appReducer = (state, action) => {
@@ -42,6 +43,8 @@ export const AppProvider = ({ children }) => {
         return { ...state, userInfo: action.payload };
       case "SET_INNER_USER_INFO":
         return { ...state, innerUserInfo: action.payload };
+      case "SET_ALERTMODAL_VISIBILITY":
+        return { ...state, alerModalVisibility: action.payload };
 
       default:
         return state;

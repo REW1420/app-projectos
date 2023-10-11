@@ -15,16 +15,19 @@ import CustomSearchbar from "../../components/elements/Particles/CustomSearchbar
 import ItemCard from "../../components/elements/Cards/ItemCard";
 import ItemShimer from "../../components/elements/Shimers/ItemShimer";
 import ProjectController from "../../utils/Networking/ProjectController";
+import AppContext from "../../utils/context/AppContext";
 const ProjecNetworking = new ProjectController();
 import { useNavigation } from "@react-navigation/native";
 
 // create a component
 export default function FishishedProjects() {
+  const { state } = React.useContext(AppContext);
+
   const navigation = useNavigation();
 
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-
+  const user_id = useState(state.userID);
   const [data2, setData2] = useState([]);
   const [query, setQuery] = useState("");
   const [filteredData, setFilteredData] = useState([]);
@@ -44,7 +47,7 @@ export default function FishishedProjects() {
     }
   };
   const handleGetData = async () => {
-    const projects = await ProjecNetworking.getCloseProject("user1");
+    const projects = await ProjecNetworking.getCloseProject(user_id);
     setData2(projects);
     console.log(projects);
     setIsLoading(true);
@@ -129,7 +132,7 @@ export default function FishishedProjects() {
             }}
           >
             <Text style={{ fontSize: 20, textAlign: "center" }}>
-              Ups, No se econtraron resultados
+              Ups, No hay proyectos completados
             </Text>
           </View>
         )}

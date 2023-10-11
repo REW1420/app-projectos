@@ -6,17 +6,21 @@ import ItemCard from "../../components/elements/Cards/ItemCard";
 import ProjectController from "../../utils/Networking/ProjectController";
 import ItemShimer from "../../components/elements/Shimers/ItemShimer";
 import { useNavigation } from "@react-navigation/native";
+import AppContext from "../../utils/context/AppContext";
 
 const ProjectNetworking = new ProjectController();
 export default function SearchProject() {
+  const { state } = React.useContext(AppContext);
+
   const navigation = useNavigation();
 
   const [isLoading, setIsLoading] = useState(false);
+  const user_id = useState(state.userID);
 
   const [data2, setData2] = useState([]);
   const fetchData = async () => {
     try {
-      const projects = await ProjectNetworking.getProjectImNotIn("user1");
+      const projects = await ProjectNetworking.getProjectImNotIn(user_id);
       setData2(projects);
       setIsLoading(true);
     } catch (error) {

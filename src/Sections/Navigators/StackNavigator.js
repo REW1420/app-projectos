@@ -12,23 +12,26 @@ import Icon from "react-native-vector-icons/Ionicons";
 import AddProject from "../Screens/AddProject";
 import AppContext from "../../utils/context/AppContext";
 import ProjectController from "../../utils/Networking/ProjectController";
+import AlertModal from "../../components/elements/Modals/AlertModal";
 import EditProject from "../Screens/EditProject";
+import SingIn from "../Screens/SingIn";
 const ProjectNetworking = new ProjectController();
 const Stack = createStackNavigator();
 export default function StackNavigator() {
   const { state, dispatch } = React.useContext(AppContext);
   const data = {
     projectName: state.projectTitle,
-    team: [{ id: "user2" }, { id: "user3" }],
-    projectOwner: "user2",
+    team: { id: state.userID },
+    projectOwner: state.userID,
     ...state.misionData,
   };
   const newData = {
     projectName: state.newProjectTitle,
-    team: [{ id: "user2" }, { id: "user3" }],
-    projectOwner: "user2",
+    team: { id: state.userID },
+    projectOwner: state.userID,
     ...state.newMisionData,
   };
+
   return (
     <Stack.Navigator initialRouteName="login">
       <Stack.Screen
@@ -67,11 +70,39 @@ export default function StackNavigator() {
                   }
                 />
               );
-            } else {
-              return state.isInTeam === false ? (
+            } else if (state.isOwner === false) {
+              return state.isInTeam ? (
                 <Pressable
                   onPress={() => {
-                    ProjectNetworking.updateJoinTeam(state.projectID, "user1");
+                    /**   ProjectNetworking.updateJoinTeam(
+                      state.projectID,
+                      state.userID
+                    ); */
+                    dispatch({
+                      type: "SET_ALERTMODAL_VISIBILITY",
+                      payload: true,
+                    });
+                  }}
+                  style={{ marginRight: 15 }}
+                >
+                  <Text
+                    style={{
+                      color: "red",
+                      fontSize: 15,
+                      fontWeight: "400",
+                    }}
+                  >
+                    Abandonar
+                  </Text>
+                </Pressable>
+              ) : (
+                <Pressable
+                  onPress={() => {
+                    /**   ProjectNetworking.updateJoinTeam(
+                      state.projectID,
+                      state.userID
+                    ); */
+                    console.log(state.isInTeam);
                   }}
                   style={{ marginRight: 15 }}
                 >
@@ -85,7 +116,7 @@ export default function StackNavigator() {
                     Unirme
                   </Text>
                 </Pressable>
-              ) : null;
+              );
             }
           },
         }}
@@ -96,7 +127,11 @@ export default function StackNavigator() {
         options={{ headerTitle: "" }}
       />
       <Stack.Screen name="ProfileSetting" component={ProfileSetting} />
-      <Stack.Screen name="SearchProject" component={SearchProject} />
+      <Stack.Screen
+        name="SearchProject"
+        component={SearchProject}
+        options={{ title: "Proyectos disponibles" }}
+      />
       <Stack.Screen
         name="AddProject"
         component={AddProject}
@@ -136,6 +171,13 @@ export default function StackNavigator() {
               </Text>
             </Pressable>
           ),
+        }}
+      />
+      <Stack.Screen
+        name="singIn"
+        component={SingIn}
+        options={{
+          headerShown: false,
         }}
       />
     </Stack.Navigator>

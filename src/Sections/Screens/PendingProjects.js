@@ -13,11 +13,13 @@ import COLORS from "../../utils/COLORS";
 import CustomSearchbar from "../../components/elements/Particles/CustomSearchbar";
 import ItemCard from "../../components/elements/Cards/ItemCard";
 import ProjectController from "../../utils/Networking/ProjectController";
+import AppContext from "../../utils/context/AppContext";
 import ItemShimer from "../../components/elements/Shimers/ItemShimer";
 import { useNavigation } from "@react-navigation/native";
 
 const ProjecNetworking = new ProjectController();
 export default function PendingProjects() {
+  const { state } = React.useContext(AppContext);
   const navigation = useNavigation();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -26,7 +28,7 @@ export default function PendingProjects() {
   const [refreshing, setRefreshing] = React.useState(false);
 
   const handleGetData = async () => {
-    const projects = await ProjecNetworking.getProjectImIn("user1");
+    const projects = await ProjecNetworking.getProjectImIn(state.userID);
     setData2(projects);
     console.log(projects);
     setIsLoading(true);

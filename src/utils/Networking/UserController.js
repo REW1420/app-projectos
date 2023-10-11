@@ -13,7 +13,6 @@ export default class UserController {
       return userInfo;
     } catch (error) {
       console.error("Error en getUserInfo:", error);
-      throw error;
     }
   }
 
@@ -49,6 +48,57 @@ export default class UserController {
       console.log("Respuesta del servidor:", newProject);
     } catch (error) {
       console.error("Error en createUser:", error);
+      throw error;
+    }
+  }
+
+  async Login(data) {
+    try {
+      const response = await fetch(BASE_URL + "user/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const serverRes = await response.json();
+      return serverRes;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async updatePersonalDoc(data, user_id) {
+    try {
+      const response = await fetch(BASE_URL + `user/update-docs/${user_id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      const serverRes = await response.json();
+      console.log(serverRes);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updatePass(data, user_id) {
+    try {
+      const response = await fetch(BASE_URL + `user/update-pass/${user_id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const serverRes = response.json();
+      return serverRes;
+    } catch (error) {
       throw error;
     }
   }

@@ -18,6 +18,7 @@ import COLORS from "../../utils/COLORS";
 import Icon from "react-native-vector-icons/Ionicons";
 import SingleItemCard from "../../components/elements/Cards/SingleItemCard";
 import ProfileItemCard from "../../components/elements/Cards/ProfileItemCard";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import AppContext from "../../utils/context/AppContext";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -28,8 +29,9 @@ const userNetworking = new UserController();
 export default function Profile() {
   const height = Dimensions.get("screen").height;
   const { state, dispatch } = React.useContext(AppContext);
-  const [userInfo, setUserInfo] = React.useState(state.userInfo._j);
+  const [userInfo, setUserInfo] = React.useState(state.userInfo);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
+
   const onRefresh = async () => {
     setIsRefreshing(true);
     const data = await userNetworking.getUserInfo(userInfo._id);
@@ -50,7 +52,27 @@ export default function Profile() {
       };
     }, [])
   );
+  const handleSnapPress = React.useCallback((index) => {
+    bottomSheetRef.current?.snapToIndex(index);
+  }, []);
+  const bottomSheetRef = React.useRef(null);
+  const snapPoints = ["30%"];
 
+  const ProfileItemCardData = [
+    { id: 0, title: "DUI", link: userInfo.personalDocs.DUI, docName: "DUI" },
+    {
+      id: 1,
+      title: "Antecedentes penales",
+      link: userInfo.personalDocs.Antecedentes,
+      docName: "Antecedentes",
+    },
+    {
+      id: 2,
+      title: "Solvencia PNC",
+      link: userInfo.personalDocs.Solvencia,
+      docName: "Solvencia",
+    },
+  ];
   return (
     <>
       <ScrollView
@@ -65,15 +87,10 @@ export default function Profile() {
         <View style={styles.secondary_backgroud}>
           <View
             style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
               marginHorizontal: 15,
               marginTop: 30,
             }}
-          >
-            <SingleItemCard tittle={"Estado"} content={"Activo"} key={0} />
-            <SingleItemCard tittle={"ID"} content={"005"} key={1} />
-          </View>
+          ></View>
         </View>
 
         <View style={styles.primary_backgroud}>
@@ -119,12 +136,24 @@ export default function Profile() {
           <Text style={{ fontSize: 30 }}>Datos personales</Text>
         </View>
         <View style={{ marginBottom: 15 }}>
-          <ProfileItemCard key={0} tittle={"DUI"} />
-          <ProfileItemCard key={1} tittle={"Antecedentes penales"} />
-          <ProfileItemCard key={2} tittle={"Solvencia PNC"} />
-          <ProfileItemCard key={3} tittle={"Linkedin"} />
-          <ProfileItemCard key={4} tittle={"Habilidades"} />
+          {ProfileItemCardData.map((item, index) => (
+            <ProfileItemCard
+              key={index}
+              tittle={item.title}
+              link={item.link}
+              userID={userInfo._id}
+              docName={item.docName}
+            />
+          ))}
         </View>
+        <BottomSheet
+          index={-1}
+          enablePanDownToClose={true}
+          snapPoints={snapPoints}
+          ref={bottomSheetRef}
+        >
+          <BottomSheetView style={{ zIndex: 999 }}></BottomSheetView>
+        </BottomSheet>
       </ScrollView>
     </>
   );
@@ -214,7 +243,7 @@ const styles = StyleSheet.create({
   secondary_backgroud: {
     width: "100%",
     height: 100,
-    backgroundColor: "#F39F5A",
+    backgroundColor: COLORS.secondary_background,
   },
   primary_backgroud: {
     backgroundColor: COLORS.primary_backgroud,

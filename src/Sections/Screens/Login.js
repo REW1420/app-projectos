@@ -4,6 +4,7 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
+  TextInput,
 } from "react-native";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -11,19 +12,36 @@ import COLORS from "../../utils/COLORS";
 import CustomTextInput from "../../components/elements/Inputs/CustomTextInput";
 import CustomButton from "../../components/elements/Buttons/CustomButton";
 import AppContext from "../../utils/context/AppContext";
+import CustomPasswordInput from "../../components/elements/Inputs/CustomPasswordInput";
 import UserController from "../../utils/Networking/UserController";
+import { useToast } from "react-native-toast-notifications";
+
+import ToastService from "../../components/elements/Toast/ToastService";
 const userNetworking = new UserController();
+
 export default function Login() {
   const { state, dispatch } = React.useContext(AppContext);
-
+  const toast = useToast();
+  const toastService = new ToastService(toast);
   const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
   const navigation = useNavigation();
 
   async function handleGetUserInfo() {
-    const data = userNetworking.getUserInfo("6516094b91620132c9e11d81");
-    dispatch({ type: "SET_USER_INFO", payload: data });
+    const data = await userNetworking.getUserInfo("6516094b91620132c9e11d81");
+
+    try {
+      dispatch({ type: "SET_USER_INFO", payload: data });
+      dispatch({ type: "SET_USER_ID", payload: data._id });
+      toastService.CustomToast(`Bienvenido ${data.name}`, "success");
+      navigation.navigate("TabNav");
+    } catch (error) {
+      toastService.CustomToast(`Ocurrio un error`, "danger");
+    }
   }
+  const showWelcomeToast = () => {
+    //toastService.UpdateToast(true);
+  };
   return (
     <ScrollView style={styles.initB}>
       <View style={styles.secondary_backgroud}></View>
@@ -43,18 +61,16 @@ export default function Login() {
           <Text style={styles.hint_text}>Bienvenido</Text>
         </View>
         <CustomTextInput
-          placeholder={"Carnet"}
+          placeholder={"Correo"}
           secureTextEntry={false}
           onChangeText={(text) => {
             setUser(text);
           }}
         />
-        <CustomTextInput
-          placeholder={"Contraseña"}
-          secureTextEntry={true}
-          onChangeText={(text) => {
-            setPwd(text);
-          }}
+
+        <CustomPasswordInput
+          Placeholder="Contraseña"
+          _onChangeText={(text) => setPwd(text)}
         />
 
         <View style={styles.container}>
@@ -62,14 +78,32 @@ export default function Login() {
             <Text style={styles.forgot_button}>¿Olvido la contraseña?</Text>
           </TouchableOpacity>
         </View>
-        <CustomButton
-          title={"Iniciar sesion"}
-          onPress={async () => {
-            await handleGetUserInfo();
-            console.log("Fetch to db using", user, pwd);
-            navigation.navigate("TabNav");
-          }}
-        />
+        <View style={{ gap: 20 }}>
+          <CustomButton
+            width={"80%"}
+            title={"Iniciar sesion"}
+            onPress={async () => {
+              await handleGetUserInfo();
+            }}
+          />
+          <View style={{ justifyContent: "center", alignItems: "center" }}>
+            <Text>O</Text>
+          </View>
+          <CustomButton
+            width={"80%"}
+            title={"Crear cuenta"}
+            onPress={async () => {
+              navigation.navigate("singIn");
+            }}
+          />
+          <CustomButton
+            width={"80%"}
+            title={"as"}
+            onPress={async () => {
+              handleGetUserInfo();
+            }}
+          />
+        </View>
       </View>
     </ScrollView>
   );

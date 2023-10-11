@@ -17,7 +17,7 @@ export default function NewMisionModal({
   const [visible, setVisible] = React.useState(isModalVisible);
   const [misionName, setMisionName] = React.useState("");
   const [description, setDescription] = React.useState("");
-  
+
   const handleChangeText = (text, state) => {
     state(text);
     console.log(data);
@@ -91,8 +91,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
-    marginTop: 20,
-    marginBottom: 15,
+    marginVertical: 20,
   },
   inputTxt: {
     backgroundColor: COLORS.input_background,

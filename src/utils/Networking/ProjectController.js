@@ -147,9 +147,11 @@ export default class ProjectController {
       throw error;
     }
   }
-  async getSingleProjectInfo(projectId) {
+  async getSingleProjectInfo(projectId, userID) {
     try {
-      const response = await fetch(BASE_URL + `projects/info/${projectId}`);
+      const response = await fetch(
+        BASE_URL + `projects/info/${projectId}/${userID}`
+      );
       const project = await response.json();
       return project;
     } catch (error) {
@@ -214,6 +216,23 @@ export default class ProjectController {
       );
       const project = await response.json();
       console.log(project);
+    } catch (error) {
+      console.error("Error en:", error);
+      throw error;
+    }
+  }
+
+  async leaveProject(projectID, userID) {
+    try {
+      const response = await fetch(
+        BASE_URL + `projects/delete-member/${projectID}/${userID}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const resJson = await response.json();
+      console.log(resJson);
     } catch (error) {
       console.error("Error en:", error);
       throw error;

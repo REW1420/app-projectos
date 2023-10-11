@@ -18,12 +18,20 @@ import AppContext from "../../utils/context/AppContext";
 import xhrGetBlob from "../../utils/Firebase/FirebaseFuntions";
 import UserController from "../../utils/Networking/UserController";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useNavigation } from "@react-navigation/native";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { storage } from "../../utils/Firebase/FirebaseConfig";
+import CustomPasswordInput from "../../components/elements/Inputs/CustomPasswordInput";
+import Icon from "react-native-vector-icons/Ionicons";
+import Validation from "../../utils/Validations/Validation";
+const validations = new Validation();
+
 const userNetworking = new UserController();
 
 const ProfileSetting = () => {
+  const navigation = useNavigation();
   const { state, dispatch } = React.useContext(AppContext);
-  const userInfo = state.userInfo._j;
+  const userInfo = state.userInfo;
   const [name, setName] = useState(userInfo.name);
   const [email, setEmail] = useState(userInfo.email);
   const [password, setPassword] = useState(userInfo.password);
@@ -188,168 +196,240 @@ const ProfileSetting = () => {
         }
       });
   }
+
+  const [isModalVisible, setIsModalVisible] = React.useState(false);
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
+  const bottomSheetRef = React.useRef(null);
+  const handleSnapPress = React.useCallback((index) => {
+    bottomSheetRef.current?.snapToIndex(index);
+  }, []);
+  const snapPoints = ["50%", "60%", "80%"];
+  const [secure, setSecure] = useState(true);
+  const [passData, setPassData] = useState({
+    newPassword: "",
+    currentPassword: "",
+  });
+  const handleChange = (name, value) => {
+    setPassData({
+      ...passData,
+      [name]: value,
+    });
+  };
+  const [promiseError, setPromiseError] = useState();
+  const [serverError, setServerError] = useState();
+  const handleUpdatePassword = async () => {
+    try {
+      validations
+        .validateNewPassword(passData.newPassword, passData.currentPassword)
+        .then(async (res) => {
+          setPromiseError(res);
+
+          if (res.status) {
+            const res = await userNetworking.updatePass(
+              passData,
+              "651888c180eaed35ebe6ef03"
+            );
+            setServerError(res);
+            console.log(res);
+          }
+        });
+    } catch (error) {
+      throw error;
+    }
+  };
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: "white",
-        paddingHorizontal: 22,
-      }}
-    >
-      <ScrollView>
-        <View
-          style={{
-            alignItems: "center",
-            marginVertical: 22,
-          }}
-        >
-          <TouchableOpacity onPress={handleImageSelection}>
-            <Image
-              source={{
-                uri:
-                  selectedImage === null
-                    ? userInfo.profilePhoto
-                    : selectedImage,
-              }}
-              style={{
-                height: 170,
-                width: 170,
-                borderRadius: 85,
-                borderWidth: 2,
-                borderColor: "white",
-              }}
-            />
-
-            <View
-              style={{
-                position: "absolute",
-                bottom: 0,
-                right: 10,
-                zIndex: 9999,
-              }}
-            >
-              <MaterialIcons name="photo-camera" size={32} color={"black"} />
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        <View>
+    <React.Fragment>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: "white",
+          paddingHorizontal: 22,
+        }}
+      >
+        <ScrollView>
           <View
             style={{
-              flexDirection: "column",
-              marginBottom: 6,
+              alignItems: "center",
+              marginVertical: 22,
             }}
           >
-            <Text>Nombre</Text>
-            <View
-              style={{
-                height: 44,
-                width: "100%",
-                borderColor: "black",
-                borderWidth: 1,
-                borderRadius: 4,
-                marginVertical: 6,
-                justifyContent: "center",
-                paddingLeft: 8,
-              }}
-            >
-              <TextInput
-                value={name}
-                onChangeText={(value) => setName(value)}
-                editable={true}
+            <TouchableOpacity onPress={handleImageSelection}>
+              <Image
+                source={{
+                  uri:
+                    selectedImage === null
+                      ? userInfo.profilePhoto
+                      : selectedImage,
+                }}
+                style={{
+                  height: 170,
+                  width: 170,
+                  borderRadius: 85,
+                  borderWidth: 2,
+                  borderColor: "white",
+                }}
               />
-            </View>
-          </View>
 
-          <View
-            style={{
-              flexDirection: "column",
-              marginBottom: 6,
-            }}
-          >
-            <Text>Correo</Text>
-            <View
-              style={{
-                height: 44,
-                width: "100%",
-                borderColor: "black",
-                borderWidth: 1,
-                borderRadius: 4,
-                marginVertical: 6,
-                justifyContent: "center",
-                paddingLeft: 8,
-              }}
-            >
-              <TextInput
-                value={email}
-                onChangeText={(value) => setEmail(value)}
-                editable={true}
-              />
-            </View>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "column",
-              marginBottom: 6,
-            }}
-          >
-            <Text>Contraseña</Text>
-            <View
-              style={{
-                height: 44,
-                width: "100%",
-                borderColor: "black",
-                borderWidth: 1,
-                borderRadius: 4,
-                marginVertical: 6,
-                justifyContent: "center",
-                paddingLeft: 8,
-              }}
-            >
-              <TextInput
-                value={password}
-                onChangeText={(value) => setPassword(value)}
-                editable={true}
-                secureTextEntry
-              />
-            </View>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "column",
-              marginBottom: 6,
-            }}
-          >
-            <Text>Fecha de nacimiento</Text>
-            <TouchableOpacity
-              onPress={handleOnPressStartDate}
-              style={{
-                height: 44,
-                width: "100%",
-                borderColor: "black",
-                borderWidth: 1,
-                borderRadius: 4,
-                marginVertical: 6,
-                justifyContent: "center",
-                paddingLeft: 8,
-              }}
-            >
-              <Text>{selectedStartDate}</Text>
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  right: 10,
+                  zIndex: 9999,
+                }}
+              >
+                <MaterialIcons name="photo-camera" size={32} color={"black"} />
+              </View>
             </TouchableOpacity>
           </View>
-        </View>
 
-        <CustomButton
-          title={"Actualizar"}
-          key={0}
-          onPress={async () => handleUpdateUser()}
-        />
+          <View>
+            <View
+              style={{
+                flexDirection: "column",
+                marginBottom: 6,
+              }}
+            >
+              <Text>Nombre</Text>
+              <View
+                style={{
+                  height: 44,
+                  width: "100%",
+                  borderColor: "black",
+                  borderWidth: 1,
+                  borderRadius: 4,
+                  marginVertical: 6,
+                  justifyContent: "center",
+                  paddingLeft: 8,
+                }}
+              >
+                <TextInput
+                  value={name}
+                  onChangeText={(value) => setName(value)}
+                  editable={true}
+                />
+              </View>
+            </View>
 
-        {renderDatePicker()}
-      </ScrollView>
-    </SafeAreaView>
+            <View
+              style={{
+                flexDirection: "column",
+                marginBottom: 6,
+              }}
+            >
+              <Text>Correo</Text>
+              <View
+                style={{
+                  height: 44,
+                  width: "100%",
+                  borderColor: "black",
+                  borderWidth: 1,
+                  borderRadius: 4,
+                  marginVertical: 6,
+                  justifyContent: "center",
+                  paddingLeft: 8,
+                }}
+              >
+                <TextInput
+                  value={email}
+                  onChangeText={(value) => setEmail(value)}
+                  editable={true}
+                />
+              </View>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "column",
+                marginBottom: 6,
+              }}
+            ></View>
+          </View>
+          <View style={{ marginVertical: 15 }}>
+            <CustomButton
+              title={"Actualizar contraseña"}
+              key={0}
+              onPress={() => handleSnapPress(0)}
+            />
+          </View>
+          <View style={{ marginVertical: 10 }}>
+            <CustomButton
+              title={"Actualizar perfil"}
+              key={1}
+              onPress={async () => handleUpdateUser()}
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+      <BottomSheet
+        index={-1}
+        enablePanDownToClose={true}
+        snapPoints={snapPoints}
+        ref={bottomSheetRef}
+      >
+        <BottomSheetView
+          style={{
+            padding: 10 * 2,
+            borderRadius: 10 * 3,
+            bottom: 10 * 3,
+          }}
+        >
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginVertical: 10,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 20,
+              }}
+            >
+              Actualizar contraseña
+            </Text>
+            <Pressable
+              onPress={() => setSecure(!secure)}
+              style={{ marginTop: 10 }}
+            >
+              <Icon
+                name={secure ? "eye-outline" : "eye-off-outline"}
+                size={35}
+              />
+            </Pressable>
+          </View>
+
+          <View>
+            <CustomPasswordInput
+              Placeholder={"Contraseña actual"}
+              secure={secure}
+              _onChangeText={(text) => handleChange("currentPassword", text)}
+            />
+            {promiseError !== undefined ? (
+              <Text>{promiseError.message}</Text>
+            ) : null}
+            <CustomPasswordInput
+              Placeholder={"Contraseña nueva"}
+              secure={secure}
+              _onChangeText={(text) => handleChange("newPassword", text)}
+            />
+            {promiseError !== undefined ? (
+              <Text>{promiseError.message}</Text>
+            ) : null}
+            {serverError !== undefined ? (
+              <Text>{serverError.error}</Text>
+            ) : null}
+          </View>
+          <CustomButton
+            title={"Actualizar contraseña"}
+            onPress={() => handleUpdatePassword()}
+          />
+        </BottomSheetView>
+      </BottomSheet>
+    </React.Fragment>
   );
 };
 

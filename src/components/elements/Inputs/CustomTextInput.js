@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import COLORS from "../../../utils/COLORS";
 export default function CustomTextInput({
   placeholder,
-  secureTextEntry,
+  secureText,
   onChangeText,
   value,
 }) {
@@ -20,7 +20,7 @@ export default function CustomTextInput({
       <View style={styles.inputContainer}>
         <TextInput
           placeholder={placeholder}
-          secureTextEntry={secureTextEntry}
+          secureTextEntry={secureText}
           style={styles.inputTxt}
           autoCapitalize="none"
           placeholderTextColor={COLORS.text_color}
