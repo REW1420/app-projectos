@@ -15,9 +15,13 @@ import NewMisionModal from "../../components/elements/Modals/NewMisionModal";
 import AlertModal from "../../components/elements/Modals/AlertModal";
 import ProjectController from "../../utils/Networking/ProjectController";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-const ProjecNetworking = new ProjectController();
+import { useToast } from "react-native-toast-notifications";
+import ToastService from "../../components/elements/Toast/ToastService";
 
 export default function Mision() {
+  const toast = useToast();
+  const toastService = new ToastService(toast);
+  const ProjecNetworking = new ProjectController(toast);
   const navigation = useNavigation();
   const [showFinishedOptions, setShowFinishedOptions] = React.useState(false);
   useFocusEffect(
@@ -163,7 +167,14 @@ export default function Mision() {
 
   const handleLeaveProject = async () => {
     await ProjecNetworking.leaveProject(projectInfo._id, state.userID).finally(
-      () => navigation.navigate("TabNav")
+      () => {
+        toastService.CustomToast("Hecho", "success");
+        navigation.navigate("TabNav");
+        dispatch({
+          type: "SET_ALERTMODAL_VISIBILITY",
+          payload: false,
+        });
+      }
     );
   };
   return (

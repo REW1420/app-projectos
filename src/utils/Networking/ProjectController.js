@@ -1,9 +1,16 @@
 const BASE_URL = "https://metriklass-api-qgrw-dev.fl0.io/";
+import ToastService from "../../components/elements/Toast/ToastService";
 
 export default class ProjectController {
   //all methods REST here
   //POST method
+
+  constructor(toastObject) {
+    this._toast = toastObject;
+  }
+
   async createProject(projectData) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(BASE_URL + "project-post", {
         method: "POST",
@@ -14,7 +21,9 @@ export default class ProjectController {
       });
 
       if (!response.ok) {
-        throw new Error("Error al crear el proyecto.");
+        toastService.CustomToast("No se pudo crear al proyecto", "danger");
+      } else {
+        toastService.CustomToast("Creado", "success");
       }
 
       const newProject = await response.json();
@@ -27,10 +36,11 @@ export default class ProjectController {
   }
 
   async getProjectImNotIn(userID) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(BASE_URL + `projects/out/${userID}`);
       if (!response.ok) {
-        throw new Error("No se pudo obtener el proyecto");
+        toastService.CustomToast("Error en la peticion", "danger");
       }
       const project = await response.json();
       return project;
@@ -41,10 +51,11 @@ export default class ProjectController {
   }
 
   async getProjectImIn(userID) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(BASE_URL + `projects/in/${userID}`);
       if (!response.ok) {
-        throw new Error("No se pudo obtener el proyecto");
+        toastService.CustomToast("Error en la peticion", "danger");
       }
       const project = await response.json();
       return project;
@@ -55,13 +66,14 @@ export default class ProjectController {
   }
 
   async getCloseProject(userID) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(BASE_URL + `projects/close/${userID}`);
 
       if (!response.ok) {
-        throw new Error(
-          `Error en la solicitud: ${response.status} ${response.statusText}`
-        );
+        toastService.CustomToast("No se pudo cerrar proyecto", "danger");
+      } else {
+        toastService.CustomToast("Hecho", "success");
       }
 
       const project = await response.json();
@@ -73,14 +85,15 @@ export default class ProjectController {
   }
 
   async deleteFromID(projectId) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(BASE_URL + `projects/delete/${projectId}`, {
         method: "DELETE",
       });
       if (!response.ok) {
-        throw new Error(
-          `Error en la solicitud: ${response.status} ${response.statusText}`
-        );
+        toastService.CustomToast("No se pudo eliminar", "danger");
+      } else {
+        toastService.CustomToast("Eliminado", "success");
       }
       const project = await response.json();
       return project;
@@ -91,6 +104,7 @@ export default class ProjectController {
   }
 
   async updateMisionStatus(projectId, misionId, status) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(
         BASE_URL + `projects/update-status/${projectId}/${misionId}`,
@@ -102,6 +116,11 @@ export default class ProjectController {
           }),
         }
       );
+      if (!response.ok) {
+        toastService.CustomToast("No se pudo actualizar", "danger");
+      } else {
+        toastService.CustomToast(status, "success");
+      }
       const project = await response.json();
       return project;
     } catch (error) {
@@ -110,6 +129,7 @@ export default class ProjectController {
     }
   }
   async updateMisionFinished(projectId, misionId) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(
         BASE_URL + `projects/update-finished/${projectId}/${misionId}`,
@@ -121,6 +141,11 @@ export default class ProjectController {
           }),
         }
       );
+      if (!response.ok) {
+        toastService.CustomToast("No se pudo actualizar la mision", "danger");
+      } else {
+        toastService.CustomToast("Terminada", "success");
+      }
       const project = await response.json();
       return project;
     } catch (error) {
@@ -129,6 +154,7 @@ export default class ProjectController {
     }
   }
   async updateProjectClose(projectId, status) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(
         BASE_URL + `projects/update-close/${projectId}`,
@@ -140,6 +166,14 @@ export default class ProjectController {
           }),
         }
       );
+      if (!response.ok) {
+        toastService.CustomToast(
+          "No se pudo unir cerrar el proyecto",
+          "danger"
+        );
+      } else {
+        toastService.CustomToast("Hecho", "success");
+      }
       const project = await response.json();
       return project;
     } catch (error) {
@@ -161,6 +195,7 @@ export default class ProjectController {
   }
 
   async updateJoinTeam(projectId, userId) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(
         BASE_URL + `projects/update-team/${projectId}`,
@@ -173,17 +208,19 @@ export default class ProjectController {
         }
       );
       if (!response.ok) {
-        throw Error("No se pudo actualizar el equipo");
+        toastService.CustomToast("No se pudo unir al proyecto", "danger");
+      } else {
+        toastService.CustomToast("Hecho", "success");
       }
       const project = await response.json();
-      console.log(project);
+      //console.log(project);
     } catch (error) {
       console.error("Error en:", error);
-      throw error;
     }
   }
 
   async updateProject(projectID, newData) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(BASE_URL + `projects/update/${projectID}`, {
         method: "PUT",
@@ -192,7 +229,9 @@ export default class ProjectController {
         body: JSON.stringify(newData),
       });
       if (!response.ok) {
-        throw Error("No se pudo actualizar el equipo");
+        toastService.CustomToast("No se pudo actualizar el proyecto", "danger");
+      } else {
+        toastService.CustomToast("Actualizado", "success");
       }
       const project = await response.json();
       console.log(project);
@@ -203,6 +242,7 @@ export default class ProjectController {
   }
 
   async updateAddNewMision(misionData, projectId) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(
         BASE_URL + `projects/add-mision/${projectId}`,
@@ -214,6 +254,11 @@ export default class ProjectController {
           body: JSON.stringify(misionData),
         }
       );
+      if (!response.ok) {
+        toastService.CustomToast("No se pudo crear nueva mision", "danger");
+      } else {
+        toastService.CustomToast("Creado", "success");
+      }
       const project = await response.json();
       console.log(project);
     } catch (error) {
@@ -223,6 +268,7 @@ export default class ProjectController {
   }
 
   async leaveProject(projectID, userID) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(
         BASE_URL + `projects/delete-member/${projectID}/${userID}`,
@@ -230,7 +276,11 @@ export default class ProjectController {
           method: "DELETE",
         }
       );
-
+      if (!response.ok) {
+        toastService.CustomToast("No se pudo abandonar el proyecto", "danger");
+      } else {
+        toastService.CustomToast("Hecho", "success");
+      }
       const resJson = await response.json();
       console.log(resJson);
     } catch (error) {

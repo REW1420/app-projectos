@@ -22,15 +22,15 @@ export default class ToastService {
     });
   };
 
-  UpdateToast = () => {
-    let id = this.toast.show("This toast will update", {});
+  UpdateToast = (pendingMssg, successMssg) => {
+    let id = this.toast.show(pendingMssg, {});
 
     setTimeout(() => {
       if (id) {
-        this.toast.update(id, "Toast updated", {
+        this.toast.update(id, successMssg, {
           type: "success",
         });
       }
-    }, 1000);
+    }, 1500);
   };
 }

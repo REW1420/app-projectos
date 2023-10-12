@@ -16,9 +16,11 @@ import ProjectController from "../../utils/Networking/ProjectController";
 import AppContext from "../../utils/context/AppContext";
 import ItemShimer from "../../components/elements/Shimers/ItemShimer";
 import { useNavigation } from "@react-navigation/native";
+import { useToast } from "react-native-toast-notifications";
 
-const ProjecNetworking = new ProjectController();
 export default function PendingProjects() {
+  const toast = useToast();
+  const ProjecNetworking = new ProjectController(toast);
   const { state } = React.useContext(AppContext);
   const navigation = useNavigation();
 

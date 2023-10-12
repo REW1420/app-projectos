@@ -16,11 +16,13 @@ import ItemCard from "../../components/elements/Cards/ItemCard";
 import ItemShimer from "../../components/elements/Shimers/ItemShimer";
 import ProjectController from "../../utils/Networking/ProjectController";
 import AppContext from "../../utils/context/AppContext";
-const ProjecNetworking = new ProjectController();
+import { useToast } from "react-native-toast-notifications";
 import { useNavigation } from "@react-navigation/native";
 
 // create a component
 export default function FishishedProjects() {
+  const toast = useToast()
+  const ProjecNetworking = new ProjectController(toast);
   const { state } = React.useContext(AppContext);
 
   const navigation = useNavigation();

@@ -12,12 +12,16 @@ import Icon from "react-native-vector-icons/Ionicons";
 import AddProject from "../Screens/AddProject";
 import AppContext from "../../utils/context/AppContext";
 import ProjectController from "../../utils/Networking/ProjectController";
-import AlertModal from "../../components/elements/Modals/AlertModal";
+import ToastService from "../../components/elements/Toast/ToastService";
+import { useToast } from "react-native-toast-notifications";
 import EditProject from "../Screens/EditProject";
 import SingIn from "../Screens/SingIn";
-const ProjectNetworking = new ProjectController();
+
 const Stack = createStackNavigator();
 export default function StackNavigator() {
+  const toast = useToast();
+  const ProjectNetworking = new ProjectController(toast);
+  const toastService = new ToastService(toast);
   const { state, dispatch } = React.useContext(AppContext);
   const data = {
     projectName: state.projectTitle,
@@ -98,11 +102,15 @@ export default function StackNavigator() {
               ) : (
                 <Pressable
                   onPress={() => {
-                    /**   ProjectNetworking.updateJoinTeam(
-                      state.projectID,
-                      state.userID
-                    ); */
-                    console.log(state.isInTeam);
+                    try {
+                      ProjectNetworking.updateJoinTeam(
+                        state.projectID,
+                        state.userID,
+                        toast
+                      );
+                    } catch (error) {
+                      console.log(error);
+                    }
                   }}
                   style={{ marginRight: 15 }}
                 >

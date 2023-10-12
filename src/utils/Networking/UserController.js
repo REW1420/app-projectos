@@ -6,7 +6,7 @@ export default class UserController {
       const response = await fetch(BASE_URL + `user/get/${user_id}`);
 
       if (!response.ok) {
-        throw new Error("Error al crear el proyecto.");
+        throw new Error("Error al iniciar sesion.");
       }
 
       const userInfo = await response.json();

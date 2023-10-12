@@ -6,7 +6,7 @@ import CustomTextInput from "../Inputs/CustomTextInput";
 import COLORS from "../../../utils/COLORS";
 import ProjectController from "../../../utils/Networking/ProjectController";
 
-const ProjecNetworking = new ProjectController();
+import { useToast } from "react-native-toast-notifications";
 export default function NewMisionModal({
   isModalVisible,
   back,
@@ -17,7 +17,8 @@ export default function NewMisionModal({
   const [visible, setVisible] = React.useState(isModalVisible);
   const [misionName, setMisionName] = React.useState("");
   const [description, setDescription] = React.useState("");
-
+  const toast = useToast();
+  const ProjecNetworking = new ProjectController(toast);
   const handleChangeText = (text, state) => {
     state(text);
     console.log(data);

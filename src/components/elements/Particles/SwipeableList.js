@@ -3,7 +3,7 @@ import React from "react";
 import { ListItem, Button } from "@rneui/themed";
 import Icon from "react-native-vector-icons/Ionicons";
 import ProjectController from "../../../utils/Networking/ProjectController";
-const ProjecNetworking = new ProjectController();
+
 
 export default function SwipeableList({
   tittle,

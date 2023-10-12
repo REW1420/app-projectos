@@ -29,7 +29,7 @@ export default function Login() {
 
   async function handleGetUserInfo() {
     const data = await userNetworking.getUserInfo("6516094b91620132c9e11d81");
-
+    console.log(data);
     try {
       dispatch({ type: "SET_USER_INFO", payload: data });
       dispatch({ type: "SET_USER_ID", payload: data._id });
