@@ -72,8 +72,6 @@ export default class ProjectController {
 
       if (!response.ok) {
         toastService.CustomToast("No se pudo cerrar proyecto", "danger");
-      } else {
-        toastService.CustomToast("Hecho", "success");
       }
 
       const project = await response.json();

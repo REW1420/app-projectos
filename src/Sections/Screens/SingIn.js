@@ -14,11 +14,12 @@ import CustomButton from "../../components/elements/Buttons/CustomButton";
 import AppContext from "../../utils/context/AppContext";
 import UserController from "../../utils/Networking/UserController";
 import Validation from "../../utils/Validations/Validation";
-import CustomPasswordInput from "../../components/elements/Inputs/CustomPasswordInput";
+import { useToast } from "react-native-toast-notifications";
 
-const userNetworking = new UserController();
 const validations = new Validation();
 export default function SingIn() {
+  const toast = useToast();
+  const userNetworking = new UserController(toast);
   const { state, dispatch } = React.useContext(AppContext);
 
   const [formData, setFormData] = React.useState({

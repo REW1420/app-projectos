@@ -24,11 +24,12 @@ import { storage } from "../../utils/Firebase/FirebaseConfig";
 import CustomPasswordInput from "../../components/elements/Inputs/CustomPasswordInput";
 import Icon from "react-native-vector-icons/Ionicons";
 import Validation from "../../utils/Validations/Validation";
+import { useToast } from "react-native-toast-notifications";
 const validations = new Validation();
 
-const userNetworking = new UserController();
-
 const ProfileSetting = () => {
+  const toast = useToast();
+  const userNetworking = new UserController(toast);
   const navigation = useNavigation();
   const { state, dispatch } = React.useContext(AppContext);
   const userInfo = state.userInfo;
@@ -66,64 +67,6 @@ const ProfileSetting = () => {
   };
   const [profileURL, setProfileURL] = React.useState(userInfo.profilePhoto);
 
-  function renderDatePicker() {
-    return (
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={openStartDatePicker}
-      >
-        <View
-          style={{
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <View
-            style={{
-              margin: 20,
-              backgroundColor: "white",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: 20,
-              padding: 35,
-              width: "90%",
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              shadowOpacity: 0.25,
-              shadowRadius: 4,
-              elevation: 5,
-            }}
-          >
-            <DatePicker
-              mode="calendar"
-              minimumDate={startDate}
-              selected={startedDate}
-              onDateChanged={handleChangeStartDate}
-              onSelectedChange={(date) => setSelectedStartDate(date)}
-              options={{
-                backgroundColor: "white",
-                textHeaderColor: "#469ab6",
-                textDefaultColor: "black",
-                selectedTextColor: "black",
-                mainColor: "#469ab6",
-                textSecondaryColor: "black",
-                borderColor: "rgba(122,146,165,0.1)",
-              }}
-            />
-
-            <Pressable onPress={handleOnPressStartDate}>
-              <Text style={{ color: "black" }}>Cerrar</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
-    );
-  }
   async function handleUpdateUser() {
     if (selectedImage !== null) {
       try {
@@ -139,40 +82,28 @@ const ProfileSetting = () => {
     }
   }
 
-  const data = {
-    id: userInfo.id,
-    name: name,
-    email: email,
-    password: password,
-    bornDate: selectedStartDate,
-    profilePhoto: profileURL,
-  };
-
-  async function uploadImage(uri, userName) {
-    const storageRef = ref(storage, `users/profilePhotos/${userName}`);
+  async function uploadImage(uri, user_id) {
+    const storageRef = ref(storage, `users/profilePhotos/${user_id}`);
     const metadata = {
       contentType: "image/jpg",
     };
 
-    let URL;
     // Obtener el blob de la URL de manera sincrónica
     const blob = await xhrGetBlob(uri);
-
-    //  console.log(blob);
 
     // Subir el blob a Firebase Storage
     const uploadTask = uploadBytes(storageRef, blob, metadata);
 
     // Obtener la URL de descarga una vez que se haya completado la carga
     await getDownloadURL((await uploadTask).ref)
-      .then((url) => {
-        // console.log("hola", url);
+      .then(async (url) => {
         setProfileURL(url);
+        console.log("hola", profileURL);
       })
-      .then(() => {
-        userNetworking.updateUser(userInfo._id, data);
-        const data = userNetworking.getUserInfo(userInfo._id);
-        dispatch({ type: "SET_USER_INFO", payload: data });
+      .then(async () => {
+        await userNetworking.updateUser(userInfo._id, data);
+        const data2 = await userNetworking.getUserInfo(userInfo._id);
+        dispatch({ type: "SET_USER_INFO", payload: data2 });
       })
       .catch((error) => {
         // A full list of error codes is available at
@@ -228,10 +159,7 @@ const ProfileSetting = () => {
           setPromiseError(res);
 
           if (res.status) {
-            const res = await userNetworking.updatePass(
-              passData,
-              "651888c180eaed35ebe6ef03"
-            );
+            const res = await userNetworking.updatePass(passData, state.userID);
             setServerError(res);
             console.log(res);
           }
@@ -239,6 +167,13 @@ const ProfileSetting = () => {
     } catch (error) {
       throw error;
     }
+  };
+
+  const data = {
+    name: name,
+    email: email,
+    password: password,
+    profilePhoto: profileURL,
   };
   return (
     <React.Fragment>
@@ -360,6 +295,11 @@ const ProfileSetting = () => {
               title={"Actualizar perfil"}
               key={1}
               onPress={async () => handleUpdateUser()}
+            />
+            <CustomButton
+              title={"a"}
+              key={2}
+              onPress={async () => console.log(state.userID)}
             />
           </View>
         </ScrollView>

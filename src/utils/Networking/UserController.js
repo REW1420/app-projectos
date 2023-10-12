@@ -1,15 +1,18 @@
 const BASE_URL = "https://metriklass-api-qgrw-dev.fl0.io/";
-
+import ToastService from "../../components/elements/Toast/ToastService";
 export default class UserController {
+  constructor(toastObject) {
+    this._toast = toastObject;
+  }
   async getUserInfo(user_id) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(BASE_URL + `user/get/${user_id}`);
-
+      const userInfo = await response.json();
       if (!response.ok) {
-        throw new Error("Error al iniciar sesion.");
+        toastService.CustomToast("No se pudo iniciar sesion", "danger");
       }
 
-      const userInfo = await response.json();
       return userInfo;
     } catch (error) {
       console.error("Error en getUserInfo:", error);
@@ -17,6 +20,7 @@ export default class UserController {
   }
 
   async updateUser(user_id, data) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(BASE_URL + `user/update/${user_id}`, {
         method: "PUT",
@@ -25,6 +29,12 @@ export default class UserController {
         },
         body: JSON.stringify(data),
       });
+
+      if (!response.ok) {
+        toastService.CustomToast("No se pudo actualzar el perfil", "danger");
+      } else {
+        toastService.CustomToast("Actualizado", "success");
+      }
       const newProject = await response.json();
 
       console.log("Respuesta del servidor:", newProject);
@@ -35,6 +45,7 @@ export default class UserController {
   }
 
   async createUser(data) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(BASE_URL + "user/post", {
         method: "POST",
@@ -43,6 +54,12 @@ export default class UserController {
         },
         body: JSON.stringify(data),
       });
+
+      if (!response.ok) {
+        toastService.CustomToast("No se pudo crear el usuario", "danger");
+      } else {
+        toastService.CustomToast("Usuario creado", "success");
+      }
       const newProject = await response.json();
 
       console.log("Respuesta del servidor:", newProject);
@@ -53,6 +70,7 @@ export default class UserController {
   }
 
   async Login(data) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(BASE_URL + "user/login", {
         method: "POST",
@@ -63,6 +81,11 @@ export default class UserController {
       });
 
       const serverRes = await response.json();
+      if (!response.ok) {
+        toastService.CustomToast("No se pudo iniciar sesion", "danger");
+      } else {
+        toastService.CustomToast(`Bienvenido ${serverRes.name}`, "success");
+      }
       return serverRes;
     } catch (error) {
       console.log(error);
@@ -71,6 +94,7 @@ export default class UserController {
   }
 
   async updatePersonalDoc(data, user_id) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(BASE_URL + `user/update-docs/${user_id}`, {
         method: "PUT",
@@ -79,6 +103,11 @@ export default class UserController {
         },
         body: JSON.stringify(data),
       });
+      if (!response.ok) {
+        toastService.CustomToast("No se pudo subir datos", "danger");
+      } else {
+        toastService.CustomToast(`Datos actualizados`, "success");
+      }
       const serverRes = await response.json();
       console.log(serverRes);
     } catch (error) {
@@ -87,6 +116,7 @@ export default class UserController {
   }
 
   async updatePass(data, user_id) {
+    const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(BASE_URL + `user/update-pass/${user_id}`, {
         method: "PUT",
@@ -96,6 +126,11 @@ export default class UserController {
         body: JSON.stringify(data),
       });
 
+      if (!response.ok) {
+        toastService.CustomToast("No se pudo cambiar contraseña", "danger");
+      } else {
+        toastService.CustomToast("Contraseña atualizada", "success");
+      }
       const serverRes = response.json();
       return serverRes;
     } catch (error) {

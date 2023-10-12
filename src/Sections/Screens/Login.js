@@ -17,11 +17,12 @@ import UserController from "../../utils/Networking/UserController";
 import { useToast } from "react-native-toast-notifications";
 
 import ToastService from "../../components/elements/Toast/ToastService";
-const userNetworking = new UserController();
+
 
 export default function Login() {
   const { state, dispatch } = React.useContext(AppContext);
   const toast = useToast();
+  const userNetworking = new UserController(toast);
   const toastService = new ToastService(toast);
   const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
@@ -30,13 +31,11 @@ export default function Login() {
   async function handleGetUserInfo() {
     const data = await userNetworking.getUserInfo("6516094b91620132c9e11d81");
     console.log(data);
-    try {
+
+    if (data !== undefined || data !== null) {
       dispatch({ type: "SET_USER_INFO", payload: data });
       dispatch({ type: "SET_USER_ID", payload: data._id });
-      toastService.CustomToast(`Bienvenido ${data.name}`, "success");
       navigation.navigate("TabNav");
-    } catch (error) {
-      toastService.CustomToast(`Ocurrio un error`, "danger");
     }
   }
   const showWelcomeToast = () => {

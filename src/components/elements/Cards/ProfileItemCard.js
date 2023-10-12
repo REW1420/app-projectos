@@ -8,7 +8,7 @@ import xhrGetBlob from "../../../utils/Firebase/FirebaseFuntions";
 import { storage } from "../../../utils/Firebase/FirebaseConfig";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import UserController from "../../../utils/Networking/UserController";
-const userNetworking = new UserController();
+import { useToast } from "react-native-toast-notifications";
 export default function ProfileItemCard({
   tittle,
   handleSnapPress,
@@ -16,6 +16,8 @@ export default function ProfileItemCard({
   userID,
   docName,
 }) {
+  const toast = useToast();
+  const userNetworking = new UserController(toast);
   const [modalVisible, setModalVisible] = React.useState(false);
   const _docName = docName;
   const toggleModal = () => {

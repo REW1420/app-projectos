@@ -23,10 +23,13 @@ import AppContext from "../../utils/context/AppContext";
 import { useFocusEffect } from "@react-navigation/native";
 
 import UserController from "../../utils/Networking/UserController";
-const userNetworking = new UserController();
+import { useToast } from "react-native-toast-notifications";
+import CustomButton from "../../components/elements/Buttons/CustomButton";
 
 // create a component
 export default function Profile() {
+  const toast = useToast();
+  const userNetworking = new UserController(toast);
   const height = Dimensions.get("screen").height;
   const { state, dispatch } = React.useContext(AppContext);
   const [userInfo, setUserInfo] = React.useState(state.userInfo);
@@ -36,7 +39,7 @@ export default function Profile() {
     setIsRefreshing(true);
     const data = await userNetworking.getUserInfo(userInfo._id);
     setUserInfo(data);
-
+    dispatch({ type: "SET_USER_INFO", payload: data });
     setIsRefreshing(false);
   };
 
@@ -45,7 +48,7 @@ export default function Profile() {
       // Esta función se ejecutará cuando esta pantalla obtenga el foco.
 
       onRefresh();
-      //  setUserInfo(data);
+
       return () => {
         // Esta función se ejecutará cuando se deje esta pantalla.
         console.log("Pantalla deenfocada");
@@ -95,7 +98,6 @@ export default function Profile() {
 
         <View style={styles.primary_backgroud}>
           <Image
-            resizeMode="contain"
             style={{
               flex: 1,
               width: 155,
@@ -109,7 +111,9 @@ export default function Profile() {
               alignSelf: "center",
               bottom: height / 12,
             }}
-            source={{ uri: userInfo.profilePhoto }}
+            source={{
+              uri: userInfo.profilePhoto,
+            }}
           />
 
           <View
@@ -122,6 +126,10 @@ export default function Profile() {
           >
             <Text style={{ fontSize: 20 }}>{userInfo.name}</Text>
             <Text style={{ fontSize: 20 }}>Programador JR</Text>
+            <CustomButton
+              title={"test"}
+              onPress={() => console.log(userInfo.profilePhoto)}
+            />
           </View>
         </View>
 
