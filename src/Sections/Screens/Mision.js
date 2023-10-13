@@ -17,6 +17,7 @@ import ProjectController from "../../utils/Networking/ProjectController";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useToast } from "react-native-toast-notifications";
 import ToastService from "../../components/elements/Toast/ToastService";
+import { useEffect } from "react";
 
 export default function Mision() {
   const toast = useToast();
@@ -146,7 +147,8 @@ export default function Mision() {
     );
     const res = await ProjecNetworking.updateMisionFinished(
       projectId,
-      misionId
+      misionId,
+      true
     );
     console.log(response, res);
   };
@@ -177,6 +179,10 @@ export default function Mision() {
       }
     );
   };
+
+  useEffect(() => {
+    console.log("update");
+  }, []);
   return (
     <React.Fragment>
       <ScrollView
@@ -207,7 +213,7 @@ export default function Mision() {
 
           {projectInfo.mision.every((item) => item.isFinished === true) ? (
             <View>
-              <Text>Nada</Text>
+              <Text>Esocge misiones para continuar el proyecto</Text>
             </View>
           ) : (
             projectInfo.mision.map((item, index) => {
@@ -241,7 +247,7 @@ export default function Mision() {
             <Text style={styles.hint_text}>Pendientes</Text>
           </View>
           {projectInfo.mision.every((item) => item.isFinished === true) ? (
-            <Text>Nada</Text>
+            <Text>No hay tareas pendientes aun</Text>
           ) : (
             projectInfo.mision.map((item, index) => {
               if (item.isFinished !== true && item.status === "Pendiente") {
@@ -275,12 +281,13 @@ export default function Mision() {
           </View>
 
           {projectInfo.mision.every((item) => item.isFinished !== true) ? (
-            <Text>Nada</Text>
+            <Text>Completa una mision para verla aqui</Text>
           ) : (
             projectInfo.mision.map((item, index) => {
               if (item.isFinished === true) {
                 return (
                   <FishishedListItem
+                    onRefresh={() => handleGetData()}
                     key={index}
                     mision={item}
                     onPressAction={() => {
@@ -423,7 +430,20 @@ export default function Mision() {
                   alignItems: "center",
                 }}
               >
-                <CustomButton title={"Desmarcar completado"} />
+                {state.isOwner ? (
+                  <CustomButton
+                    title={"Desmarcar completado"}
+                    onPress={async () => {
+                      await handleUpdateToPending(projectInfo._id, misionId);
+                      await ProjecNetworking.updateMisionFinished(
+                        projectInfo._id,
+                        misionId,
+                        false
+                      );
+                      handleGetData();
+                    }}
+                  />
+                ) : null}
               </View>
             ) : (
               <View
@@ -440,6 +460,7 @@ export default function Mision() {
                     handleGetData();
                   }}
                 />
+
                 <CustomButton title={"Marcar Completado"} />
               </View>
             )}

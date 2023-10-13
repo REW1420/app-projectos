@@ -15,7 +15,7 @@ import ItemCard from "../../components/elements/Cards/ItemCard";
 import ProjectController from "../../utils/Networking/ProjectController";
 import AppContext from "../../utils/context/AppContext";
 import ItemShimer from "../../components/elements/Shimers/ItemShimer";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useToast } from "react-native-toast-notifications";
 
 export default function PendingProjects() {
@@ -61,6 +61,19 @@ export default function PendingProjects() {
 
     setRefreshing(true);
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Esta función se ejecutará cuando esta pantalla obtenga el foco.
+      console.log("Pantalla enfocada");
+      handleGetData();
+      return () => {
+        // Esta función se ejecutará cuando se deje esta pantalla.
+        console.log("se desenfocada");
+        handleGetData();
+      };
+    }, [])
+  );
   return (
     <ScrollView
       style={styles.initB}

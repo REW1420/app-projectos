@@ -126,7 +126,7 @@ export default class ProjectController {
       throw error;
     }
   }
-  async updateMisionFinished(projectId, misionId) {
+  async updateMisionFinished(projectId, misionId, status) {
     const toastService = new ToastService(this._toast);
     try {
       const response = await fetch(
@@ -135,7 +135,7 @@ export default class ProjectController {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            isFinished: true,
+            isFinished: status,
           }),
         }
       );

@@ -21,6 +21,7 @@ export default class UserController {
 
   async updateUser(user_id, data) {
     const toastService = new ToastService(this._toast);
+    toastService.CustomToast("Actualizando...", "normal");
     try {
       const response = await fetch(BASE_URL + `user/update/${user_id}`, {
         method: "PUT",
@@ -46,6 +47,7 @@ export default class UserController {
 
   async createUser(data) {
     const toastService = new ToastService(this._toast);
+    toastService.CustomToast("Creando...", "normal");
     try {
       const response = await fetch(BASE_URL + "user/post", {
         method: "POST",
@@ -55,14 +57,15 @@ export default class UserController {
         body: JSON.stringify(data),
       });
 
+      const newProject = await response.json();
+      console.log("Respuesta del servidor:", newProject);
       if (!response.ok) {
-        toastService.CustomToast("No se pudo crear el usuario", "danger");
+        toastService.CustomToast(newProject.message, "danger");
+        return false;
       } else {
         toastService.CustomToast("Usuario creado", "success");
+        return true;
       }
-      const newProject = await response.json();
-
-      console.log("Respuesta del servidor:", newProject);
     } catch (error) {
       console.error("Error en createUser:", error);
       throw error;

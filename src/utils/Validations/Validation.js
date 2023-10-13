@@ -54,7 +54,7 @@ export default class Validation {
   }
 
   validateName(name) {
-    const nameRegex = /^[^\d\s]*$/;
+    const nameRegex = /[a-zA-Z]+'?[a-zA-Z]+/g;
     const isNameValid = nameRegex.test(name);
     return new Promise((resolve, reject) => {
       if (name.trim() !== "") {

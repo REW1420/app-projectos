@@ -17,11 +17,11 @@ import ItemShimer from "../../components/elements/Shimers/ItemShimer";
 import ProjectController from "../../utils/Networking/ProjectController";
 import AppContext from "../../utils/context/AppContext";
 import { useToast } from "react-native-toast-notifications";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
 // create a component
 export default function FishishedProjects() {
-  const toast = useToast()
+  const toast = useToast();
   const ProjecNetworking = new ProjectController(toast);
   const { state } = React.useContext(AppContext);
 
@@ -55,9 +55,7 @@ export default function FishishedProjects() {
     setIsLoading(true);
     setRefreshing(false);
   };
-  React.useEffect(() => {
-    handleGetData();
-  }, []);
+
   const onRefresh = React.useCallback(() => {
     handleGetData();
 
@@ -65,6 +63,18 @@ export default function FishishedProjects() {
       setRefreshing(true);
     }, 100);
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Esta función se ejecutará cuando esta pantalla obtenga el foco.
+      handleGetData();
+      return () => {
+        // Esta función se ejecutará cuando se deje esta pantalla.
+        handleGetData();
+      };
+    }, [])
+  );
+
   return (
     <ScrollView
       style={styles.initB}

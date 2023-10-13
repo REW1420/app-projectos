@@ -4,7 +4,6 @@ import { ListItem, Button } from "@rneui/themed";
 import Icon from "react-native-vector-icons/Ionicons";
 import ProjectController from "../../../utils/Networking/ProjectController";
 
-
 export default function SwipeableList({
   tittle,
   status,
@@ -29,7 +28,6 @@ export default function SwipeableList({
                 justifyContent: "center",
               }}
               onPress={async () => {
-                console.log("res");
                 await updateAction();
                 refresh();
                 //reset();
@@ -78,7 +76,7 @@ export function WorkingSwipeableList({
             onPress={async () => {
               await updateAction();
               refresh();
-              //   reset();
+              reset();
             }}
             icon={<Icon name="stop-circle-outline" size={35} color={"red"} />}
             buttonStyle={{ minHeight: "110%", backgroundColor: "white" }}
@@ -92,8 +90,8 @@ export function WorkingSwipeableList({
                 margin: 5,
                 justifyContent: "center",
               }}
-              onPress={() => {
-                updateToFinish();
+              onPress={async () => {
+                await updateToFinish();
                 refresh();
                 reset();
               }}

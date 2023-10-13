@@ -95,12 +95,11 @@ export default function SingIn() {
       isPasswordValid.status === true
     ) {
       try {
-        await userNetworking.createUser(newUser);
+        const res = await userNetworking.createUser(newUser);
+        res ? navigation.navigate("Login") : null;
       } catch (error) {
-        throw error;
-      } finally {
-        navigation.navigate("Login");
-      }
+        console.error(error);
+      } 
     } else {
       return;
     }
@@ -133,7 +132,7 @@ export default function SingIn() {
         {isNameValid === undefined ? null : <Text>{isNameValid.message}</Text>}
         <CustomTextInputForm
           placeholder={"Correo"}
-          secureTextEntry={true}
+          secureTextEntry={false}
           isValid={isEmailValid === undefined ? null : isEmailValid.status}
           onChangeText={(text) => {
             handleChange("email", text);

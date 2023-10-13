@@ -33,11 +33,14 @@ export default function CustomListItem({ item }) {
   );
 }
 
-export function FishishedListItem({ mision, onPressAction }) {
+export function FishishedListItem({ mision, onPressAction, onRefresh }) {
   return (
     <ListItem
       containerStyle={{ borderRadius: 10, overflow: "hidden", margin: 5 }}
-      onPress={onPressAction}
+      onPress={() => {
+        onPressAction();
+        onRefresh();
+      }}
     >
       <Icon name="bookmark" size={25} />
       <ListItem.Content>
