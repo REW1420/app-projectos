@@ -129,7 +129,8 @@ export default function Mision() {
       misionId,
       "Trabajando"
     );
-    console.log(response);
+    setProjectInfo(response.project);
+    console.log(response.project);
   };
   const handleUpdateToPending = async (projectId, misionId) => {
     const response = await ProjecNetworking.updateMisionStatus(
@@ -137,7 +138,8 @@ export default function Mision() {
       misionId,
       "Pendiente"
     );
-    console.log(response);
+    setProjectInfo(response.project);
+    console.log(response.project);
   };
   const handleUpdateToFinished = async (projectId, misionId) => {
     const response = await ProjecNetworking.updateMisionStatus(
@@ -150,7 +152,9 @@ export default function Mision() {
       misionId,
       true
     );
-    console.log(response, res);
+    setProjectInfo(response.project);
+
+    console.log(response.project, res);
   };
   const handleStartProject = async () => {
     const res = await ProjecNetworking.updateProjectClose(
@@ -225,7 +229,7 @@ export default function Mision() {
                     status={item.status}
                     misionId={item.id}
                     projectId={projectInfo._id}
-                    refresh={() => handleGetData()}
+                   
                     updateAction={() =>
                       handleUpdateToPending(projectInfo._id, item.id)
                     }
@@ -259,7 +263,7 @@ export default function Mision() {
                     MissionDetail={item.description}
                     misionId={item.id}
                     projectId={projectInfo._id}
-                    refresh={() => handleGetData()}
+                  
                     updateAction={() =>
                       handleUpdateToWork(projectInfo._id, item.id)
                     }
@@ -287,7 +291,7 @@ export default function Mision() {
               if (item.isFinished === true) {
                 return (
                   <FishishedListItem
-                    onRefresh={() => handleGetData()}
+                    
                     key={index}
                     mision={item}
                     onPressAction={() => {

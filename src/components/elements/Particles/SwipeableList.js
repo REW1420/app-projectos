@@ -7,7 +7,7 @@ import ProjectController from "../../../utils/Networking/ProjectController";
 export default function SwipeableList({
   tittle,
   status,
-  refresh,
+
   onPressSnap,
   updateAction,
 }) {
@@ -29,8 +29,7 @@ export default function SwipeableList({
               }}
               onPress={async () => {
                 await updateAction();
-                refresh();
-                //reset();
+                reset();
               }}
               icon={<Icon name="thumbs-up-outline" size={35} color={"green"} />}
               buttonStyle={{ minHeight: "110%", backgroundColor: "white" }}
@@ -54,7 +53,7 @@ export function WorkingSwipeableList({
   status,
 
   onPressSnap,
-  refresh,
+
   updateAction,
   updateToFinish,
 }) {
@@ -75,7 +74,7 @@ export function WorkingSwipeableList({
             }}
             onPress={async () => {
               await updateAction();
-              refresh();
+
               reset();
             }}
             icon={<Icon name="stop-circle-outline" size={35} color={"red"} />}
@@ -92,7 +91,7 @@ export function WorkingSwipeableList({
               }}
               onPress={async () => {
                 await updateToFinish();
-                refresh();
+
                 reset();
               }}
               icon={<Icon name="checkmark-outline" size={35} color={"green"} />}

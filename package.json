@@ -14,8 +14,8 @@
     "@react-navigation/material-top-tabs": "^6.6.3",
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/stack": "^6.3.17",
-    "@rneui/base": "^4.0.0-rc.8",
-    "@rneui/themed": "^4.0.0-rc.8",
+    "@rneui/base": "4.0.0-rc.8",
+    "@rneui/themed": "4.0.0-rc.8",
     "expo": "~49.0.8",
     "expo-blur": "~12.4.1",
     "expo-document-picker": "~11.5.4",
@@ -42,7 +42,8 @@
     "react-native-svg": "^13.13.0",
     "react-native-tab-view": "^3.5.2",
     "react-native-toast-notifications": "^3.4.0",
-    "react-native-vector-icons": "^10.0.0"
+    "react-native-vector-icons": "^10.0.0",
+    "react-native-web": "^0.19.9"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

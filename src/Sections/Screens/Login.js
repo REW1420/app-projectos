@@ -33,7 +33,7 @@ export default function Login() {
     const data = await userNetworking.getUserInfo("6516094b91620132c9e11d81");
     const kpiData = await dashboardNetworking.getDataFromID("asda");
 
-    const usefullData = kpiData.map((item) => ({
+    const usefulData = kpiData.kpi.map((item) => ({
       count: item.count,
       date: item.date,
     }));
@@ -41,7 +41,8 @@ export default function Login() {
     if (data !== undefined || data !== null) {
       dispatch({ type: "SET_USER_INFO", payload: data });
       dispatch({ type: "SET_USER_ID", payload: data._id });
-      dispatch({ type: "SET_KPI_DATA", payload: usefullData });
+      dispatch({ type: "SET_KPI_DATA", payload: usefulData });
+      dispatch({ type: "SET_PROJECT_KPI_DATA", payload: kpiData.project });
 
       navigation.navigate("TabNav");
     }

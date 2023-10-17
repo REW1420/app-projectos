@@ -18,6 +18,7 @@ export const AppProvider = ({ children }) => {
     innerUserInfo: {},
     alerModalVisibility: false,
     KPIData: [],
+    KPIProject: [],
   };
 
   const appReducer = (state, action) => {
@@ -48,6 +49,8 @@ export const AppProvider = ({ children }) => {
         return { ...state, alerModalVisibility: action.payload };
       case "SET_KPI_DATA":
         return { ...state, KPIData: action.payload };
+      case "SET_PROJECT_KPI_DATA":
+        return { ...state, KPIProject: action.payload };
       default:
         return state;
     }

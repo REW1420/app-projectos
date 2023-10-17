@@ -48,12 +48,12 @@ export default function Dashboard() {
   const toastService = new ToastService(toas);
   const [contributionData, setContibutionData] = React.useState(state.KPIData);
   const [_refreshing, setRefreshing] = React.useState(false);
-
+  let kpiProject = state.KPIProject;
   const handleGetData = async () => {
     setRefreshing(true);
     const res = await dashboarNetworking.getDataFromID("asda");
 
-    const usefullData = res.map((item) => ({
+    const usefullData = res.kpi.map((item) => ({
       count: item.count,
       date: item.date,
     }));
@@ -125,12 +125,16 @@ export default function Dashboard() {
             Informacion sobre proyectos
           </Text>
           <View style={{ marginVertical: 15 }}>
-            <Text style={{ fontSize: 15 }}>Terminados : 10</Text>
-            <Text style={{ fontSize: 15 }}>Pendientes : 10</Text>
+            <Text style={{ fontSize: 15 }}>
+              Terminados : {kpiProject.isFinished}
+            </Text>
+            <Text style={{ fontSize: 15 }}>
+              Pendientes : {kpiProject.pending}
+            </Text>
           </View>
 
           <ProgressChart
-            data={data}
+            data={[kpiProject.finishedPercentage]}
             width={width - 50}
             radius={20}
             height={200}
