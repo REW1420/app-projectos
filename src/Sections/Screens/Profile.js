@@ -37,7 +37,7 @@ export default function Profile() {
 
   const onRefresh = async () => {
     setIsRefreshing(true);
-    const data = await userNetworking.getUserInfo(userInfo._id);
+    const data = await userNetworking.getUserInfo(state.userID);
     setUserInfo(data);
     dispatch({ type: "SET_USER_INFO", payload: data });
     setIsRefreshing(false);

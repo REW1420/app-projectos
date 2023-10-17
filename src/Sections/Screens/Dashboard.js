@@ -6,8 +6,9 @@ import {
   Text,
   ScrollableTabView,
   View,
+  RefreshControl,
 } from "react-native";
-//import ScrollableTabView from 'react-native-scrollable-tab-view'
+
 import {
   LineChart,
   BarChart,
@@ -17,16 +18,12 @@ import {
 } from "react-native-chart-kit";
 import { contributionData, pieChartData, progressChartData } from "./data";
 import AddButton from "../../components/elements/Buttons/AddButton";
-// in Expo - swipe left to see the following styling, or create your own
-const data = {
-  labels: ["January", "February", "March", "April", "May", "June"],
-  datasets: [
-    {
-      data: [20, 45, 28, 80, 99, 43],
-    },
-  ],
-  legend: ["Titulo"],
-};
+import DashboardController from "../../utils/Networking/DashboarController";
+import { useToast } from "react-native-toast-notifications";
+import { Button } from "react-native";
+import ToastService from "../../components/elements/Toast/ToastService";
+import AppContext from "../../utils/context/AppContext";
+
 const chartConfig = {
   backgroundColor: "#e26a00",
   backgroundGradientFrom: "#fb8c00",
@@ -42,89 +39,144 @@ const chartConfig = {
   },
 };
 
-const data2 = [
-  {
-    name: "Enero",
-    population: 20,
-    color: "#FF5733",
-    legendFontColor: "#7F7F7F",
-    legendFontSize: 15,
-  },
-  {
-    name: "Febrero",
-    population: 45,
-    color: "#33FF57",
-    legendFontColor: "#7F7F7F",
-    legendFontSize: 15,
-  },
-  {
-    name: "Marzo",
-    population: 28,
-    color: "#5733FF",
-    legendFontColor: "#7F7F7F",
-    legendFontSize: 15,
-  },
-  {
-    name: "Abril",
-    population: 80,
-    color: "#FF5733",
-    legendFontColor: "#7F7F7F",
-    legendFontSize: 15,
-  },
-  {
-    name: "Mayo",
-    population: 99,
-    color: "#33FF57",
-    legendFontColor: "#7F7F7F",
-    legendFontSize: 15,
-  },
-];
 export default function Dashboard() {
-  const width = Dimensions.get("window").width - 50; // from react-native
-  const height = 220;
+  const { state } = React.useContext(AppContext);
+  const width = Dimensions.get("window").width - 25; // from react-native
 
+  const toas = useToast();
+  const dashboarNetworking = new DashboardController(toas);
+  const toastService = new ToastService(toas);
+  const [contributionData, setContibutionData] = React.useState(state.KPIData);
+  const [_refreshing, setRefreshing] = React.useState(false);
+
+  const handleGetData = async () => {
+    setRefreshing(true);
+    const res = await dashboarNetworking.getDataFromID("asda");
+
+    const usefullData = res.map((item) => ({
+      count: item.count,
+      date: item.date,
+    }));
+    setContibutionData(usefullData);
+    setRefreshing(false);
+  };
+
+  function formatDateString(inputDate) {
+    const date = new Date(inputDate);
+
+    const year = date.getFullYear();
+    const monthNames = [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
+    ];
+    const month = monthNames[date.getMonth()];
+    const day = date.getDate();
+
+    const formattedDate = ` ${day < 10 ? "0" : ""}${day} ${month}`;
+
+    return formattedDate;
+  }
+
+  function getTodayDate() {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+    const day = String(currentDate.getDate() + 1).padStart(2, "0");
+    const formattedDate = `${year}-${month}-${day}`;
+    console.log(formattedDate);
+    return formattedDate;
+  }
+  const data = {
+    data: [0.4, 0.6],
+  };
   return (
     <>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={_refreshing}
+            onRefresh={() => handleGetData()}
+          />
+        }
+      >
         <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          style={{
+            flex: 1,
+            alignItems: "center",
+
+            marginTop: 15,
+          }}
         >
-          <Text>Bezier Line Chart</Text>
+          <Text
+            style={{
+              fontSize: 25,
+            }}
+          >
+            Informacion sobre proyectos
+          </Text>
+          <View style={{ marginVertical: 15 }}>
+            <Text style={{ fontSize: 15 }}>Terminados : 10</Text>
+            <Text style={{ fontSize: 15 }}>Pendientes : 10</Text>
+          </View>
 
           <ProgressChart
-            data={progressChartData}
-            width={300}
+            data={data}
+            width={width - 50}
+            radius={20}
             height={200}
             chartConfig={chartConfig}
+            center={true}
             style={{
-              marginVertical: 8,
+              marginVertical: 15,
               borderRadius: 16,
             }}
           />
-
+          <Text
+            style={{
+              fontSize: 25,
+            }}
+          >
+            Contibuciones
+          </Text>
           <ContributionGraph
-            values={[
-              { date: "2017-01-02", count: 1 },
-              { date: "2017-01-03", count: 2 },
-              { date: "2017-01-04", count: 3 },
-              { date: "2017-01-05", count: 4 },
-              { date: "2017-01-06", count: 5 },
-              { date: "2017-01-30", count: 2 },
-              { date: "2017-01-31", count: 3 },
-              { date: "2017-03-01", count: 2 },
-              { date: "2017-04-02", count: 4 },
-              { date: "2017-03-05", count: 2 },
-              { date: "2017-02-30", count: 4 },
-            ]}
-            endDate={new Date("2017-04-01")}
+            values={contributionData}
+            endDate={getTodayDate()}
             numDays={105}
             width={width}
             height={220}
+            style={{
+              marginVertical: 15,
+              borderRadius: 16,
+
+              alignItems: "center",
+              justifyContent: "center",
+            }}
             chartConfig={chartConfig}
+            onDayPress={(day) => {
+              console.log(day);
+              if (day.count === 0) {
+                toastService.CustomToast(
+                  `No hay contribuciones el día ${formatDateString(day.date)}`
+                );
+              } else {
+                toastService.CustomToast(
+                  `${formatDateString(day.date)} Contribuciones: ${day.count}`
+                );
+              }
+            }}
           />
         </View>
       </ScrollView>
-
     </>
   );
 }

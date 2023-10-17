@@ -14,15 +14,16 @@ import CustomButton from "../../components/elements/Buttons/CustomButton";
 import AppContext from "../../utils/context/AppContext";
 import CustomPasswordInput from "../../components/elements/Inputs/CustomPasswordInput";
 import UserController from "../../utils/Networking/UserController";
+import DashboardController from "../../utils/Networking/DashboarController";
 import { useToast } from "react-native-toast-notifications";
 
 import ToastService from "../../components/elements/Toast/ToastService";
-
 
 export default function Login() {
   const { state, dispatch } = React.useContext(AppContext);
   const toast = useToast();
   const userNetworking = new UserController(toast);
+  const dashboardNetworking = new DashboardController(toast);
   const toastService = new ToastService(toast);
   const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
@@ -30,11 +31,18 @@ export default function Login() {
 
   async function handleGetUserInfo() {
     const data = await userNetworking.getUserInfo("6516094b91620132c9e11d81");
-    console.log(data);
+    const kpiData = await dashboardNetworking.getDataFromID("asda");
+
+    const usefullData = kpiData.map((item) => ({
+      count: item.count,
+      date: item.date,
+    }));
 
     if (data !== undefined || data !== null) {
       dispatch({ type: "SET_USER_INFO", payload: data });
       dispatch({ type: "SET_USER_ID", payload: data._id });
+      dispatch({ type: "SET_KPI_DATA", payload: usefullData });
+
       navigation.navigate("TabNav");
     }
   }
