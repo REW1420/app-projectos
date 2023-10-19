@@ -34,7 +34,36 @@ export default class ProjectController {
       throw error;
     }
   }
-
+  async updateMissionStatusv2(_isFinished, _status, _projectID, _misionID) {
+    const toastService = new ToastService(this._toast);
+    try {
+      const res = await fetch(
+        `https://metriklass-api-qgrw-dev.fl0.io/projects/update-status/${_projectID}/${_misionID}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            isFinished: _isFinished,
+            newStatus: _status,
+          }),
+        }
+      );
+      if (!res.ok) {
+        toastService.CustomToast(
+          `No se pudo actualizar la misión a ${_status}`,
+          "danger"
+        );
+      }
+      const response = await res.json();
+      console.log(response);
+      return response.project;
+    } catch (error) {
+      console.error("Error en actualizar estado:", error);
+      throw error;
+    }
+  }
   async getProjectImNotIn(userID) {
     const toastService = new ToastService(this._toast);
     try {

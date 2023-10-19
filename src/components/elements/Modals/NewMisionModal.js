@@ -24,13 +24,9 @@ export default function NewMisionModal({
     console.log(data);
   };
   const [newID, setNewID] = React.useState("");
-  React.useEffect(() => {
-    const _int = parseInt(id);
-    const _results = _int + 1;
-    setNewID(_results);
-  }, []);
+
   const data = {
-    id: newID,
+    id: parseInt(id) + 1,
     misionName: misionName,
     description: description,
     isFinished: false,

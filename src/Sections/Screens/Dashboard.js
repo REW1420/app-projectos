@@ -1,26 +1,17 @@
 import React from "react";
 import {
   ScrollView,
-  StatusBar,
   Dimensions,
   Text,
-  ScrollableTabView,
   View,
   RefreshControl,
 } from "react-native";
 
-import {
-  LineChart,
-  BarChart,
-  PieChart,
-  ProgressChart,
-  ContributionGraph,
-} from "react-native-chart-kit";
-import { contributionData, pieChartData, progressChartData } from "./data";
-import AddButton from "../../components/elements/Buttons/AddButton";
+import { ProgressChart, ContributionGraph } from "react-native-chart-kit";
+
 import DashboardController from "../../utils/Networking/DashboarController";
 import { useToast } from "react-native-toast-notifications";
-import { Button } from "react-native";
+
 import ToastService from "../../components/elements/Toast/ToastService";
 import AppContext from "../../utils/context/AppContext";
 
@@ -48,16 +39,18 @@ export default function Dashboard() {
   const toastService = new ToastService(toas);
   const [contributionData, setContibutionData] = React.useState(state.KPIData);
   const [_refreshing, setRefreshing] = React.useState(false);
-  let kpiProject = state.KPIProject;
+  const [kpiProject, setKpiProject] = React.useState(state.KPIProject);
+
   const handleGetData = async () => {
     setRefreshing(true);
-    const res = await dashboarNetworking.getDataFromID("asda");
-
+    const res = await dashboarNetworking.getDataFromID(state.userID);
+    console.log("res", res);
     const usefullData = res.kpi.map((item) => ({
       count: item.count,
       date: item.date,
     }));
     setContibutionData(usefullData);
+    setKpiProject(res.project);
     setRefreshing(false);
   };
 
@@ -96,9 +89,7 @@ export default function Dashboard() {
     console.log(formattedDate);
     return formattedDate;
   }
-  const data = {
-    data: [0.4, 0.6],
-  };
+  console.log(kpiProject);
   return (
     <>
       <ScrollView
@@ -131,10 +122,11 @@ export default function Dashboard() {
             <Text style={{ fontSize: 15 }}>
               Pendientes : {kpiProject.pending}
             </Text>
+            <Text>Participando: 10</Text>
           </View>
 
           <ProgressChart
-            data={[kpiProject.finishedPercentage]}
+            data={[, kpiProject.finishedPercentage]}
             width={width - 50}
             radius={20}
             height={200}

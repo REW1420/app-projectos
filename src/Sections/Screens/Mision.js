@@ -18,11 +18,13 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useToast } from "react-native-toast-notifications";
 import ToastService from "../../components/elements/Toast/ToastService";
 import { useEffect } from "react";
-
+import DashboardController from "../../utils/Networking/DashboarController";
+import { Button } from "react-native";
 export default function Mision() {
   const toast = useToast();
   const toastService = new ToastService(toast);
   const ProjecNetworking = new ProjectController(toast);
+  const dashboardNetworking = new DashboardController(toast);
   const navigation = useNavigation();
   const [showFinishedOptions, setShowFinishedOptions] = React.useState(false);
   useFocusEffect(
@@ -42,28 +44,25 @@ export default function Mision() {
     route.params?.projectInfo
   );
   const bottomSheetRef = React.useRef(null);
+  const bottomSheetRef2 = React.useRef(null);
 
   const [itemDescription, setItemDescription] = React.useState("");
-  const [owner, setOwner] = React.useState("");
+  const [MISIONID, SETMISIONID] = React.useState("");
+
   const handleSnapPress = React.useCallback((index) => {
     bottomSheetRef.current?.snapToIndex(index);
   }, []);
+  const handleSnapPress2 = React.useCallback((index) => {
+    bottomSheetRef2.current?.snapToIndex(index);
+  }, []);
   const snapPoints = ["30%"];
-  const [totalFinished, setTotalFinished] = React.useState(0);
-  const [total, setTotal] = React.useState(0);
+
   React.useEffect(() => {
     handleGetData();
     handleSetOwnerShip();
     handleIsInTeam();
     dispatch({ type: "SET_PROJECT_ID", payload: projectInfo._id });
     dispatch({ type: "SET_IS_IN_TEAM", payload: projectInfo.isMemberInTeam });
-
-    const misionesTerminadas = projectInfo.mision.filter(
-      (mision) => mision.isFinished === true
-    );
-    const misionesTotal = Object.keys(projectInfo.mision).length;
-    setTotal(misionesTotal);
-    setTotalFinished(misionesTerminadas.length);
   }, []);
 
   const handleSetOwnerShip = () => {
@@ -111,7 +110,6 @@ export default function Mision() {
       state.userID
     );
 
-    setMisionId(res.lastMissionId);
     setProjectInfo(res);
     console.log(res);
   };
@@ -121,41 +119,7 @@ export default function Mision() {
     handleIsInTeam();
     setRefreshing(false);
   }, []);
-  const [misionId, setMisionId] = React.useState("");
 
-  const handleUpdateToWork = async (projectId, misionId) => {
-    const response = await ProjecNetworking.updateMisionStatus(
-      projectId,
-      misionId,
-      "Trabajando"
-    );
-    setProjectInfo(response.project);
-    console.log(response.project);
-  };
-  const handleUpdateToPending = async (projectId, misionId) => {
-    const response = await ProjecNetworking.updateMisionStatus(
-      projectId,
-      misionId,
-      "Pendiente"
-    );
-    setProjectInfo(response.project);
-    console.log(response.project);
-  };
-  const handleUpdateToFinished = async (projectId, misionId) => {
-    const response = await ProjecNetworking.updateMisionStatus(
-      projectId,
-      misionId,
-      "Terminado"
-    );
-    const res = await ProjecNetworking.updateMisionFinished(
-      projectId,
-      misionId,
-      true
-    );
-    setProjectInfo(response.project);
-
-    console.log(response.project, res);
-  };
   const handleStartProject = async () => {
     const res = await ProjecNetworking.updateProjectClose(
       projectInfo._id,
@@ -184,9 +148,17 @@ export default function Mision() {
     );
   };
 
-  useEffect(() => {
-    console.log("update");
-  }, []);
+  const handleUpdateMisionStatus = async (_mision_id, _status, _isFinished) => {
+    const response = await ProjecNetworking.updateMissionStatusv2(
+      _isFinished,
+      _status,
+      projectInfo._id,
+      _mision_id
+    );
+    setProjectInfo(response);
+    console.log(response);
+  };
+
   return (
     <React.Fragment>
       <ScrollView
@@ -206,10 +178,16 @@ export default function Mision() {
           <PercentageCard
             percentage={projectInfo.progress}
             projectName={projectInfo.projectName}
-            total={total}
-            missingTotal={totalFinished}
+            total={projectInfo.total}
+            missingTotal={projectInfo.completedMisions}
             daysLeft={projectInfo.daysLeft}
             key={0}
+          />
+          <Button
+            title="as"
+            onPress={async () => {
+              console.log("ass", projectInfo.completedMisions);
+            }}
           />
           <View style={styles.textContainerRigth}>
             <Text style={styles.hint_text}>Trabajando</Text>
@@ -229,16 +207,16 @@ export default function Mision() {
                     status={item.status}
                     misionId={item.id}
                     projectId={projectInfo._id}
-                   
                     updateAction={() =>
-                      handleUpdateToPending(projectInfo._id, item.id)
+                      handleUpdateMisionStatus(item._id, "Pendiente", false)
                     }
                     updateToFinish={() => {
-                      handleUpdateToFinished(projectInfo._id, item.id);
+                      handleUpdateMisionStatus(item._id, "Terminado", true);
                     }}
                     onPressSnap={() => {
-                      handleSnapPress(0);
+                      handleSnapPress2(0);
                       setItemDescription(item.description);
+                      SETMISIONID(item._id);
                     }}
                   />
                 );
@@ -263,14 +241,14 @@ export default function Mision() {
                     MissionDetail={item.description}
                     misionId={item.id}
                     projectId={projectInfo._id}
-                  
                     updateAction={() =>
-                      handleUpdateToWork(projectInfo._id, item.id)
+                      handleUpdateMisionStatus(item._id, "Trabajando", false)
                     }
                     onPressSnap={() => {
                       handleSnapPress(0);
                       setItemDescription(item.description);
                       setShowFinishedOptions(false);
+                      SETMISIONID(item._id);
                     }}
                   />
                 );
@@ -291,13 +269,13 @@ export default function Mision() {
               if (item.isFinished === true) {
                 return (
                   <FishishedListItem
-                    
                     key={index}
                     mision={item}
                     onPressAction={() => {
                       handleSnapPress(0);
                       setItemDescription(item.description);
                       setShowFinishedOptions(true);
+                      SETMISIONID(item._id);
                     }}
                   />
                 );
@@ -438,13 +416,7 @@ export default function Mision() {
                   <CustomButton
                     title={"Desmarcar completado"}
                     onPress={async () => {
-                      await handleUpdateToPending(projectInfo._id, misionId);
-                      await ProjecNetworking.updateMisionFinished(
-                        projectInfo._id,
-                        misionId,
-                        false
-                      );
-                      handleGetData();
+                      handleUpdateMisionStatus(MISIONID, "Pendiente", false);
                     }}
                   />
                 ) : null}
@@ -460,14 +432,60 @@ export default function Mision() {
                 <CustomButton
                   title={"Marcar Trabajando"}
                   onPress={() => {
-                    handleSnapPress(0);
-                    handleGetData();
+                    handleUpdateMisionStatus(MISIONID, "Trabajando", false);
                   }}
                 />
 
-                <CustomButton title={"Marcar Completado"} />
+                <CustomButton
+                  title={"Marcar Completado"}
+                  onPress={() => {
+                    handleUpdateMisionStatus(MISIONID, "Terminado", true);
+                  }}
+                />
               </View>
             )}
+          </View>
+        </BottomSheetView>
+      </BottomSheet>
+      <BottomSheet
+        index={-1}
+        enablePanDownToClose={true}
+        snapPoints={snapPoints}
+        ref={bottomSheetRef2}
+      >
+        <BottomSheetView>
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 15,
+            }}
+          >
+            <Text style={{ fontSize: 20 }}>Descipción de la Mision</Text>
+          </View>
+          <Text style={{ margin: 15 }}>{itemDescription}</Text>
+          <View style={{ marginTop: 15 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <CustomButton
+                title={"Marcar Pendiente"}
+                onPress={() => {
+                  handleUpdateMisionStatus(MISIONID, "Pendiente", false);
+                }}
+              />
+
+              <CustomButton
+                title={"Marcar Completado"}
+                onPress={() => {
+                  handleUpdateMisionStatus(MISIONID, "Terminado", true);
+                }}
+              />
+            </View>
           </View>
         </BottomSheetView>
       </BottomSheet>

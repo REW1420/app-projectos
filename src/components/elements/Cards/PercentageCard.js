@@ -23,10 +23,12 @@ const PercentageCard = ({
             }}
           >
             <View style={{ marginVertical: 10 }}>
-              <Text>Misiones: {missingTotal}/{total}</Text>
+              <Text>
+                Misiones: {missingTotal}/{total}
+              </Text>
             </View>
             <View style={{ marginVertical: 10 }}>
-              <Text>Fecha de inicio</Text>
+              <Text>Finaliza en</Text>
             </View>
             <View style={styles.daysRemaining}>
               <Text style={styles.daysRemainingText}>{daysLeft}d</Text>

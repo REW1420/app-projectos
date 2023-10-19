@@ -18,6 +18,7 @@ import DashboardController from "../../utils/Networking/DashboarController";
 import { useToast } from "react-native-toast-notifications";
 
 import ToastService from "../../components/elements/Toast/ToastService";
+import { Pressable } from "react-native";
 
 export default function Login() {
   const { state, dispatch } = React.useContext(AppContext);
@@ -31,7 +32,9 @@ export default function Login() {
 
   async function handleGetUserInfo() {
     const data = await userNetworking.getUserInfo("6516094b91620132c9e11d81");
-    const kpiData = await dashboardNetworking.getDataFromID("asda");
+    const kpiData = await dashboardNetworking.getDataFromID(
+      "6516094b91620132c9e11d81"
+    );
 
     const usefulData = kpiData.kpi.map((item) => ({
       count: item.count,
@@ -81,12 +84,12 @@ export default function Login() {
           _onChangeText={(text) => setPwd(text)}
         />
 
-        <View style={styles.container}>
+        <View style={{ display: "flex", marginLeft: "auto", marginRight: 30 }}>
           <TouchableOpacity>
-            <Text style={styles.forgot_button}>¿Olvido la contraseña?</Text>
+            <Text style={styles.forgot_button}>¿Olvidó la contraseña?</Text>
           </TouchableOpacity>
         </View>
-        <View style={{ gap: 20 }}>
+        <View style={{ marginTop: -20 }}>
           <CustomButton
             width={"80%"}
             title={"Iniciar sesion"}
@@ -94,24 +97,36 @@ export default function Login() {
               await handleGetUserInfo();
             }}
           />
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <Text>O</Text>
-          </View>
-          <CustomButton
-            width={"80%"}
-            title={"Crear cuenta"}
-            onPress={async () => {
-              navigation.navigate("singIn");
-            }}
-          />
-          <CustomButton
-            width={"80%"}
-            title={"as"}
-            onPress={async () => {
-              handleGetUserInfo();
-            }}
-          />
         </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            marginVertical: 15,
+          }}
+        >
+          <Text>O inicia sesion con</Text>
+        </View>
+      </View>
+
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text style={{ fontSize: 15 }}>Si eres nuevo </Text>
+        <Pressable
+          onPress={() => {
+            navigation.navigate("singIn");
+          }}
+        >
+          <Text style={{ fontSize: 15, fontWeight: "bold" }}>
+            Crea una cuenta
+          </Text>
+        </Pressable>
       </View>
     </ScrollView>
   );
