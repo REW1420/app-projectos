@@ -25,6 +25,7 @@ export default function StackNavigator() {
   const { state, dispatch } = React.useContext(AppContext);
   const data = {
     projectName: state.projectTitle,
+    deadLine: state.deadLine,
     team: { id: state.userID },
     projectOwner: state.userID,
     ...state.misionData,

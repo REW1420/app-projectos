@@ -210,8 +210,13 @@ export default function Mision() {
                     updateAction={() =>
                       handleUpdateMisionStatus(item._id, "Pendiente", false)
                     }
-                    updateToFinish={() => {
-                      handleUpdateMisionStatus(item._id, "Terminado", true);
+                    updateToFinish={async () => {
+                      await handleUpdateMisionStatus(
+                        item._id,
+                        "Terminado",
+                        true
+                      );
+                      dashboardNetworking.addContribution(state.userID);
                     }}
                     onPressSnap={() => {
                       handleSnapPress2(0);
@@ -438,8 +443,9 @@ export default function Mision() {
 
                 <CustomButton
                   title={"Marcar Completado"}
-                  onPress={() => {
-                    handleUpdateMisionStatus(MISIONID, "Terminado", true);
+                  onPress={async () => {
+                    await handleUpdateMisionStatus(MISIONID, "Terminado", true);
+                    dashboardNetworking.addContribution(state.userID);
                   }}
                 />
               </View>
@@ -481,8 +487,9 @@ export default function Mision() {
 
               <CustomButton
                 title={"Marcar Completado"}
-                onPress={() => {
-                  handleUpdateMisionStatus(MISIONID, "Terminado", true);
+                onPress={async () => {
+                  await handleUpdateMisionStatus(MISIONID, "Terminado", true);
+                  dashboardNetworking.addContribution(state.userID);
                 }}
               />
             </View>

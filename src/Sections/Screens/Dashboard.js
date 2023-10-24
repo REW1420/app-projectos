@@ -84,7 +84,7 @@ export default function Dashboard() {
     const currentDate = new Date();
     const year = currentDate.getFullYear();
     const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-    const day = String(currentDate.getDate() + 1).padStart(2, "0");
+    const day = String(currentDate.getDate()).padStart(2, "0");
     const formattedDate = `${year}-${month}-${day}`;
     console.log(formattedDate);
     return formattedDate;
@@ -113,12 +113,13 @@ export default function Dashboard() {
               fontSize: 25,
             }}
           >
-            Informacion sobre proyectos
+            Información sobre proyectos
           </Text>
           <View style={{ marginVertical: 15 }}>
             <Text style={{ fontSize: 15 }}>
               Terminados : {kpiProject.isFinished}
             </Text>
+            <Text>{getTodayDate()}</Text>
             <Text style={{ fontSize: 15 }}>
               Pendientes : {kpiProject.pending}
             </Text>
@@ -142,7 +143,7 @@ export default function Dashboard() {
               fontSize: 25,
             }}
           >
-            Contibuciones
+            Contribuciones
           </Text>
           <ContributionGraph
             values={contributionData}

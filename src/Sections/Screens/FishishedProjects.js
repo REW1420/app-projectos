@@ -30,7 +30,7 @@ export default function FishishedProjects() {
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const user_id = useState(state.userID);
-  const [data2, setData2] = useState([]);
+  const [data2, setData2] = useState([state.pendingProjectData]);
   const [query, setQuery] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [notFoundItem, setNoFoundItem] = useState(false);
