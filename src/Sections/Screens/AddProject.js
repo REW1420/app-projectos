@@ -59,7 +59,7 @@ export default function AddProject() {
         >
           <CustomTextInput
             onChangeText={(value) => setInputValue(i, value, "description")}
-            placeholder={"Descripcion"}
+            placeholder={"Descripción"}
           />
         </View>
       </React.Fragment>
@@ -101,7 +101,7 @@ export default function AddProject() {
   return (
     <ScrollView>
       <View style={{ marginTop: 15, ...styles.container }}>
-        <Text style={{ fontSize: 30 }}>Crea un nuevo projecto</Text>
+        <Text style={{ fontSize: 30 }}>Crea un nuevo proyecto</Text>
       </View>
       <NewProjectCard />
       <View style={{ marginTop: 15, ...styles.container }}>

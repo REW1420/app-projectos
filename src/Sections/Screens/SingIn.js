@@ -15,11 +15,13 @@ import AppContext from "../../utils/context/AppContext";
 import UserController from "../../utils/Networking/UserController";
 import Validation from "../../utils/Validations/Validation";
 import { useToast } from "react-native-toast-notifications";
+import ToastService from "../../components/elements/Toast/ToastService";
 
 const validations = new Validation();
 export default function SingIn() {
   const toast = useToast();
   const userNetworking = new UserController(toast);
+  const toastService = new ToastService(toast);
   const { state, dispatch } = React.useContext(AppContext);
 
   const [formData, setFormData] = React.useState({
@@ -57,6 +59,7 @@ export default function SingIn() {
   const [isPasswordValid, setPasswordValid] = useState();
   const [isNameValid, setNameValid] = useState();
   const [isOccupationValid, setOccupationValid] = useState();
+
   async function handleValidate() {
     const emailPromise = validations.validateEmail(formData.email);
     const passwordPromise = validations.validatePassword(
@@ -87,6 +90,15 @@ export default function SingIn() {
       occupation: formData.occupation,
       password: formData.confirmPassword,
     };
+    if (
+      formData.confirmPassword === "" &&
+      formData.email === "" &&
+      formData.name == "" &&
+      formData.occupation === "" &&
+      formData.password === ""
+    ) {
+      toastService.CustomToast("Los datos no pueden estar vacíos", "warning");
+    }
     await handleValidate();
     if (
       isEmailValid.status === true &&
@@ -99,7 +111,7 @@ export default function SingIn() {
         res ? navigation.navigate("Login") : null;
       } catch (error) {
         console.error(error);
-      } 
+      }
     } else {
       return;
     }

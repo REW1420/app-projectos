@@ -19,6 +19,7 @@ export const AppProvider = ({ children }) => {
     alerModalVisibility: false,
     KPIData: [],
     KPIProject: [],
+    pendingProjectData: [],
     deadLine: "",
   };
 
@@ -52,7 +53,9 @@ export const AppProvider = ({ children }) => {
         return { ...state, KPIData: action.payload };
       case "SET_PROJECT_KPI_DATA":
         return { ...state, KPIProject: action.payload };
-      case "SET_PROJECT_DEADLINE":
+      case "SET_PENDINGPROJECT_DATA":
+        return { ...state, pendingProjectData: action.payload };
+      case "SET_DEADLINE_PROJECT":
         return { ...state, deadLine: action.payload };
       default:
         return state;

@@ -21,7 +21,7 @@ import { useToast } from "react-native-toast-notifications";
 export default function PendingProjects() {
   const toast = useToast();
   const ProjecNetworking = new ProjectController(toast);
-  const { state } = React.useContext(AppContext);
+  const { state, dispatch } = React.useContext(AppContext);
   const navigation = useNavigation();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +32,12 @@ export default function PendingProjects() {
   const handleGetData = async () => {
     const projects = await ProjecNetworking.getProjectImIn(state.userID);
     setData2(projects);
-    console.log(projects);
+    const projectsFinished = await ProjecNetworking.getCloseProject(
+      state.userID
+    );
+    dispatch({ type: "SET_PENDINGPROJECT_DATA", payload: projectsFinished });
+
+    //console.log(projects);
     setIsLoading(true);
     setRefreshing(false);
   };
