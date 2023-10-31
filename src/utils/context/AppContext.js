@@ -19,6 +19,7 @@ export const AppProvider = ({ children }) => {
     alerModalVisibility: false,
     KPIData: [],
     KPIProject: [],
+    deadLine: "",
   };
 
   const appReducer = (state, action) => {
@@ -51,6 +52,8 @@ export const AppProvider = ({ children }) => {
         return { ...state, KPIData: action.payload };
       case "SET_PROJECT_KPI_DATA":
         return { ...state, KPIProject: action.payload };
+      case "SET_PROJECT_DEADLINE":
+        return { ...state, deadLine: action.payload };
       default:
         return state;
     }

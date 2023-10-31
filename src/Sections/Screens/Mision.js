@@ -183,19 +183,14 @@ export default function Mision() {
             daysLeft={projectInfo.daysLeft}
             key={0}
           />
-          <Button
-            title="as"
-            onPress={async () => {
-              console.log("ass", projectInfo.completedMisions);
-            }}
-          />
+
           <View style={styles.textContainerRigth}>
             <Text style={styles.hint_text}>Trabajando</Text>
           </View>
 
           {projectInfo.mision.every((item) => item.isFinished === true) ? (
             <View>
-              <Text>Esocge misiones para continuar el proyecto</Text>
+              <Text>Escoge misiones para continuar el proyecto</Text>
             </View>
           ) : (
             projectInfo.mision.map((item, index) => {
@@ -212,6 +207,7 @@ export default function Mision() {
                     }
                     updateToFinish={() => {
                       handleUpdateMisionStatus(item._id, "Terminado", true);
+                      dashboardNetworking.addContribution(state.userID);
                     }}
                     onPressSnap={() => {
                       handleSnapPress2(0);
@@ -221,7 +217,11 @@ export default function Mision() {
                   />
                 );
               } else {
-                return null;
+                return (
+                  <View key={0}>
+                    <Text>Escoge misiones para continuar el proyecto</Text>
+                  </View>
+                );
               }
             })
           )}
@@ -253,7 +253,7 @@ export default function Mision() {
                   />
                 );
               } else {
-                return null;
+                return <Text>No hay tareas pendientes aun</Text>;
               }
             })
           )}
@@ -440,6 +440,7 @@ export default function Mision() {
                   title={"Marcar Completado"}
                   onPress={() => {
                     handleUpdateMisionStatus(MISIONID, "Terminado", true);
+                    dashboardNetworking.addContribution(state.userID);
                   }}
                 />
               </View>
@@ -463,7 +464,9 @@ export default function Mision() {
           >
             <Text style={{ fontSize: 20 }}>Descipción de la Mision</Text>
           </View>
-          <Text style={{ margin: 15 }}>{itemDescription}</Text>
+          <View style={{ margin: 15 }}>
+            <Text>{itemDescription}</Text>
+          </View>
           <View style={{ marginTop: 15 }}>
             <View
               style={{

@@ -27,6 +27,7 @@ export default function StackNavigator() {
     projectName: state.projectTitle,
     team: { id: state.userID },
     projectOwner: state.userID,
+    deadLine: state.deadLine,
     ...state.misionData,
   };
   const newData = {
@@ -148,7 +149,8 @@ export default function StackNavigator() {
           headerRight: () => (
             <Pressable
               onPress={() => {
-                ProjectNetworking.createProject(data);
+                 ProjectNetworking.createProject(data);
+              //  console.log(data);
               }}
               style={{ marginRight: 15 }}
             >
