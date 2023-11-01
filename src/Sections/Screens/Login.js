@@ -16,12 +16,15 @@ import CustomPasswordInput from "../../components/elements/Inputs/CustomPassword
 import UserController from "../../utils/Networking/UserController";
 import DashboardController from "../../utils/Networking/DashboarController";
 import { useToast } from "react-native-toast-notifications";
-
+import ConfigContext from "../../utils/context/ConfigContext";
 import ToastService from "../../components/elements/Toast/ToastService";
 import { Pressable } from "react-native";
+import NoInternetConnectionModal from "../../components/elements/Modals/NoInternetConnectionModal";
 
 export default function Login() {
-  const { state, dispatch } = React.useContext(AppContext);
+  const { dispatch } = React.useContext(AppContext);
+  const { state } = React.useContext(ConfigContext);
+  const configContext = React.useContext(ConfigContext);
   const toast = useToast();
   const userNetworking = new UserController(toast);
   const dashboardNetworking = new DashboardController(toast);
@@ -128,6 +131,7 @@ export default function Login() {
           </Text>
         </Pressable>
       </View>
+      <NoInternetConnectionModal key={0} hasConnection={!state.isAppReady} />
     </ScrollView>
   );
 }

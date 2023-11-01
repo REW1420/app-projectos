@@ -68,7 +68,7 @@ export default function SingIn() {
     );
     const namePromise = validations.validateName(formData.email);
     const notNullPromise = validations.validateNotNull(formData.occupation);
-
+      
     Promise.all([emailPromise, passwordPromise, namePromise, notNullPromise])
       .then(
         ([emailIsValid, passwordIsValid, nameIsValid, occupationIsValid]) => {

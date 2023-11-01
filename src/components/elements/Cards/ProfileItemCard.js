@@ -8,6 +8,7 @@ import xhrGetBlob from "../../../utils/Firebase/FirebaseFuntions";
 import { storage } from "../../../utils/Firebase/FirebaseConfig";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import UserController from "../../../utils/Networking/UserController";
+import ToastService from "../Toast/ToastService";
 import { useToast } from "react-native-toast-notifications";
 export default function ProfileItemCard({
   tittle,
@@ -18,6 +19,7 @@ export default function ProfileItemCard({
 }) {
   const toast = useToast();
   const userNetworking = new UserController(toast);
+  const toastService = new ToastService(toast);
   const [modalVisible, setModalVisible] = React.useState(false);
   const _docName = docName;
   const toggleModal = () => {
@@ -25,6 +27,7 @@ export default function ProfileItemCard({
   };
   const handleUploadPDF = async () => {
     console.log("selecionado pdf");
+
     await DocumentPicker.getDocumentAsync({
       type: "application/pdf",
       multiple: false,
@@ -34,6 +37,8 @@ export default function ProfileItemCard({
   };
 
   async function uploadPDF(uri) {
+    toastService.CustomToast("Subiendo PDF", "normal");
+
     console.log("subiendo pdf");
 
     const storageRef = ref(storage, `users/personalDocs/${userID}/${tittle}`);
@@ -53,6 +58,8 @@ export default function ProfileItemCard({
     await getDownloadURL((await uploadTask).ref)
       .then((url) => {
         // console.log("hola", url);
+        toastService.CustomToast("Se subio el archivo", "succed");
+
         URL = url;
       })
       .then(async () => {
@@ -68,18 +75,31 @@ export default function ProfileItemCard({
         switch (error.code) {
           case "storage/object-not-found":
             // File doesn't exist
+            toastService.CustomToast("Error al subir el archivo", "error");
             break;
           case "storage/unauthorized":
             // User doesn't have permission to access the object
+            toastService.CustomToast(
+              "Error al subir el archivo, no hay permisos",
+              "error"
+            );
+
             break;
           case "storage/canceled":
             // User canceled the upload
+            toastService.CustomToast(
+              "Se cancelo la subida del archivo",
+              "warnign"
+            );
+
             break;
 
           // ...
 
           case "storage/unknown":
             // Unknown error occurred, inspect the server response
+            toastService.CustomToast("Error en el servidor", "error");
+
             break;
         }
       });
@@ -111,7 +131,7 @@ export default function ProfileItemCard({
               justifyContent: "space-between",
             }}
           >
-            {link !== "" ? (
+            {link !== null ? (
               <Pressable
                 onPress={() => Linking.openURL(link)}
                 style={{ marginHorizontal: 10 }}

@@ -116,4 +116,17 @@ export default class Validation {
       }
     });
   }
+  async validateServerStatus() {
+    const BASE_URL = "https://metriklass-api-qgrw-dev.fl0.io/";
+    const res = await fetch(BASE_URL + "status");
+    const resjson = await res.json();
+    // console.log(resjson);
+    return new Promise((resolve, reject) => {
+      if (resjson.isOnline === true) {
+        resolve(true);
+      } else {
+        reject(false);
+      }
+    });
+  }
 }

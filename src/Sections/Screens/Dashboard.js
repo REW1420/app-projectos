@@ -84,7 +84,7 @@ export default function Dashboard() {
     const currentDate = new Date();
     const year = currentDate.getFullYear();
     const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-    const day = String(currentDate.getDate()).padStart(2, "0");
+    const day = String(currentDate.getDate());
     const formattedDate = `${year}-${month}-${day}`;
     console.log(formattedDate);
     return formattedDate;
@@ -161,6 +161,7 @@ export default function Dashboard() {
             chartConfig={chartConfig}
             onDayPress={(day) => {
               console.log(day);
+
               if (day.count === 0) {
                 toastService.CustomToast(
                   `No hay contribuciones el día ${formatDateString(day.date)}`
