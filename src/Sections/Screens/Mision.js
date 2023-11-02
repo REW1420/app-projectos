@@ -188,7 +188,7 @@ export default function Mision() {
             <Text style={styles.hint_text}>Trabajando</Text>
           </View>
 
-          {projectInfo.mision.every((item) => item.isFinished === true) ? (
+          {projectInfo.mision.every((item) => item.status !== "Trabajando") ? (
             <View>
               <Text>Escoge misiones para continuar el proyecto</Text>
             </View>
@@ -220,19 +220,13 @@ export default function Mision() {
                     }}
                   />
                 );
-              } else {
-                return (
-                  <View key={0}>
-                    <Text>Escoge misiones para continuar el proyecto</Text>
-                  </View>
-                );
               }
             })
           )}
           <View style={styles.textContainerRigth}>
             <Text style={styles.hint_text}>Pendientes</Text>
           </View>
-          {projectInfo.mision.every((item) => item.isFinished === true) ? (
+          {projectInfo.mision.every((item) => item.status !== "Pendiente") ? (
             <Text>No hay tareas pendientes aun</Text>
           ) : (
             projectInfo.mision.map((item, index) => {
@@ -256,8 +250,6 @@ export default function Mision() {
                     }}
                   />
                 );
-              } else {
-                return <Text>No hay tareas pendientes aun</Text>;
               }
             })
           )}
@@ -266,7 +258,9 @@ export default function Mision() {
             <Text style={styles.hint_text}>Terminadas</Text>
           </View>
 
-          {projectInfo.mision.every((item) => item.isFinished !== true) ? (
+          {projectInfo.mision.every(
+            (item) => item.isFinished !== true && item.status !== "Terminado"
+          ) ? (
             <Text>Completa una mision para verla aqui</Text>
           ) : (
             projectInfo.mision.map((item, index) => {
@@ -283,8 +277,6 @@ export default function Mision() {
                     }}
                   />
                 );
-              } else {
-                return null;
               }
             })
           )}

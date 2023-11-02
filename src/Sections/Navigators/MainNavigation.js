@@ -11,6 +11,7 @@ export default function MainNavigation() {
       dispatch({ type: "SET_APP_READY", payload: state.isConnected });
     });
   }, []);
+
   return (
     <NavigationContainer>
       <StackNavigator />
