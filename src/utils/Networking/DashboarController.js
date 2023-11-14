@@ -1,4 +1,4 @@
- const BASE_URL = "https://metriklass-api-qgrw-dev.fl0.io/";
+const BASE_URL = "https://metriklass-api-qgrw-dev.fl0.io/";
 import ToastService from "../../components/elements/Toast/ToastService";
 export default class DashboardController {
   constructor(toastObject) {

@@ -126,10 +126,6 @@ export default function Profile() {
           >
             <Text style={{ fontSize: 20 }}>{userInfo.name}</Text>
             <Text style={{ fontSize: 20 }}>Programador JR</Text>
-            <CustomButton
-              title={"test"}
-              onPress={() => console.log(ProfileItemCardData)}
-            />
           </View>
         </View>
 

@@ -150,8 +150,8 @@ export default function StackNavigator() {
           headerRight: () => (
             <Pressable
               onPress={() => {
-                 ProjectNetworking.createProject(data);
-              //  console.log(data);
+                ProjectNetworking.createProject(data);
+                //  console.log(data);
               }}
               style={{ marginRight: 15 }}
             >

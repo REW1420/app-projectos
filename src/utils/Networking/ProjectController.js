@@ -214,7 +214,18 @@ export default class ProjectController {
         BASE_URL + `projects/info/${projectId}/${userID}`
       );
       const project = await response.json();
-      return project;
+      if (!response.ok) {
+        const badData = {
+          status: 404,
+          ...project,
+        };
+        return badData;
+      }
+      const goodData = {
+        status: 200,
+        ...project,
+      };
+      return goodData;
     } catch (error) {
       console.error("Error en:", error);
       throw error;

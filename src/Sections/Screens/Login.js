@@ -20,7 +20,7 @@ import ConfigContext from "../../utils/context/ConfigContext";
 import ToastService from "../../components/elements/Toast/ToastService";
 import { Pressable } from "react-native";
 import NoInternetConnectionModal from "../../components/elements/Modals/NoInternetConnectionModal";
-
+import ResetPasswordModal from "../../components/elements/Modals/ResetPasswordModal";
 export default function Login() {
   const { dispatch } = React.useContext(AppContext);
   const { state } = React.useContext(ConfigContext);
@@ -32,7 +32,7 @@ export default function Login() {
   const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
   const navigation = useNavigation();
-
+  const [resetPasswordModal, setResetPasswordModal] = useState(false);
   async function handleGetUserInfo() {
     const data = await userNetworking.getUserInfo("6516094b91620132c9e11d81");
     const kpiData = await dashboardNetworking.getDataFromID(
@@ -53,8 +53,8 @@ export default function Login() {
       navigation.navigate("TabNav");
     }
   }
-  const showWelcomeToast = () => {
-    //toastService.UpdateToast(true);
+  const toggleResetPasswordModal = () => {
+    setResetPasswordModal(!resetPasswordModal);
   };
   return (
     <ScrollView style={styles.initB}>
@@ -88,7 +88,7 @@ export default function Login() {
         />
 
         <View style={{ display: "flex", marginLeft: "auto", marginRight: 30 }}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={toggleResetPasswordModal}>
             <Text style={styles.forgot_button}>¿Olvidó la contraseña?</Text>
           </TouchableOpacity>
         </View>
@@ -132,6 +132,11 @@ export default function Login() {
         </Pressable>
       </View>
       <NoInternetConnectionModal key={0} hasConnection={!state.isAppReady} />
+      <ResetPasswordModal
+        isVisible={resetPasswordModal}
+        toggleModal={toggleResetPasswordModal}
+        key={1}
+      />
     </ScrollView>
   );
 }

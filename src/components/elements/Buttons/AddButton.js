@@ -4,17 +4,18 @@ import {
   TouchableWithoutFeedback,
   View,
   StyleSheet,
-  Image,
   Animated,
-  Pressable,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
+import AppContext from "../../../utils/context/AppContext";
+import SearchProjectModal from "../Modals/SearchProjectModal";
+import { Modal } from "react-native-paper";
 const AddButton = ({}) => {
   const navigation = useNavigation();
   const [opened, setOpened] = useState(false);
   const animation = React.useRef(new Animated.Value(0)).current;
-
+  const { dispatch, state } = React.useContext(AppContext);
   React.useEffect(() => {
     Animated.timing(animation, {
       toValue: opened ? 1 : 0,
@@ -36,117 +37,125 @@ const AddButton = ({}) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.box}>
-        <TouchableWithoutFeedback
-          onPress={() => {
-            navigation.navigate("SearchProject");
-          }}
-        >
-          <Animated.View
-            style={[
-              styles.item,
-              opacity,
-              {
-                transform: [
-                  {
-                    translateX: animation.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, -100],
-                    }),
-                  },
-                  {
-                    translateY: animation.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, -15],
-                    }),
-                  },
-                ],
-              },
-            ]}
+    <React.Fragment>
+      <View style={styles.container}>
+        <View style={styles.box}>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              dispatch({
+                type: "SET_SEARCH_MODAL_VISIBILITY",
+                payload: true,
+              });
+            }}
           >
-            <Icon name="search-outline" size={30} />
-          </Animated.View>
-        </TouchableWithoutFeedback>
+            <Animated.View
+              style={[
+                styles.item,
+                opacity,
+                {
+                  transform: [
+                    {
+                      translateX: animation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0, -100],
+                      }),
+                    },
+                    {
+                      translateY: animation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0, -15],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              <Icon name="search-outline" size={30} />
+            </Animated.View>
+          </TouchableWithoutFeedback>
 
-        <TouchableWithoutFeedback
-          onPress={() => navigation.navigate("AddProject")}
-        >
-          <Animated.View
-            style={[
-              styles.item,
-              opacity,
-              {
-                transform: [
-                  {
-                    translateX: animation.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, -50],
-                    }),
-                  },
-                  {
-                    translateY: animation.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, -15],
-                    }),
-                  },
-                ],
-              },
-            ]}
+          <TouchableWithoutFeedback
+            onPress={() => navigation.navigate("AddProject")}
           >
-            <Icon name="add-outline" size={40} />
-          </Animated.View>
-        </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback onPress={() => navigation.navigate("News")}>
-          <Animated.View
-            style={[
-              styles.item,
-              opacity,
-              {
-                transform: [
-                  {
-                    translateX: animation.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, -150],
-                    }),
-                  },
-                  {
-                    translateY: animation.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, -15],
-                    }),
-                  },
-                ],
-              },
-            ]}
+            <Animated.View
+              style={[
+                styles.item,
+                opacity,
+                {
+                  transform: [
+                    {
+                      translateX: animation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0, -50],
+                      }),
+                    },
+                    {
+                      translateY: animation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0, -15],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              <Icon name="add-outline" size={40} />
+            </Animated.View>
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={() => navigation.navigate("News")}>
+            <Animated.View
+              style={[
+                styles.item,
+                opacity,
+                {
+                  transform: [
+                    {
+                      translateX: animation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0, -150],
+                      }),
+                    },
+                    {
+                      translateY: animation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0, -15],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              <Icon name="notifications-outline" size={30} />
+            </Animated.View>
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback
+            onPress={() => toggleOpened()}
+            style={styles.addButton}
           >
-            <Icon name="notifications-outline" size={30} />
-          </Animated.View>
-        </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback
-          onPress={() => toggleOpened()}
-          style={styles.addButton}
-        >
-          <Animated.View
-            style={[
-              styles.addButtonInner,
-              {
-                transform: [
-                  {
-                    rotate: animation.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: ["0deg", "180deg"],
-                    }),
-                  },
-                ],
-              },
-            ]}
-          >
-            <Icon name="chevron-back-outline" size={30} />
-          </Animated.View>
-        </TouchableWithoutFeedback>
+            <Animated.View
+              style={[
+                styles.addButtonInner,
+                {
+                  transform: [
+                    {
+                      rotate: animation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ["0deg", "180deg"],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              <Icon name="chevron-back-outline" size={30} />
+            </Animated.View>
+          </TouchableWithoutFeedback>
+        </View>
       </View>
-    </View>
+      <React.Fragment>
+        <SearchProjectModal />
+      </React.Fragment>
+    </React.Fragment>
   );
 };
 

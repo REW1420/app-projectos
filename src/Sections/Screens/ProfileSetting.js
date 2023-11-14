@@ -5,7 +5,6 @@ import {
   ScrollView,
   Image,
   TextInput,
-  Modal,
 } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,7 +16,12 @@ import CustomButton from "../../components/elements/Buttons/CustomButton";
 import AppContext from "../../utils/context/AppContext";
 import xhrGetBlob from "../../utils/Firebase/FirebaseFuntions";
 import UserController from "../../utils/Networking/UserController";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 import { useNavigation } from "@react-navigation/native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { storage } from "../../utils/Firebase/FirebaseConfig";
@@ -88,43 +92,47 @@ const ProfileSetting = () => {
       contentType: "image/jpg",
     };
 
-    // Obtener el blob de la URL de manera sincrónica
-    const blob = await xhrGetBlob(uri);
-
-    // Subir el blob a Firebase Storage
-    const uploadTask = uploadBytes(storageRef, blob, metadata);
-
-    // Obtener la URL de descarga una vez que se haya completado la carga
-    await getDownloadURL((await uploadTask).ref)
-      .then(async (url) => {
-        setProfileURL(url);
-        console.log("hola", profileURL);
+    await deleteObject(storageRef)
+      .then(() => {
+        console.log("object deleted");
       })
       .then(async () => {
-        await userNetworking.updateUser(userInfo._id, data);
-        const data2 = await userNetworking.getUserInfo(userInfo._id);
-        dispatch({ type: "SET_USER_INFO", payload: data2 });
-      })
-      .catch((error) => {
-        // A full list of error codes is available at
-        // https://firebase.google.com/docs/storage/web/handle-errors
-        switch (error.code) {
-          case "storage/object-not-found":
-            // File doesn't exist
-            break;
-          case "storage/unauthorized":
-            // User doesn't have permission to access the object
-            break;
-          case "storage/canceled":
-            // User canceled the upload
-            break;
+        const blob = await xhrGetBlob(uri);
 
-          // ...
+        const uploadTask = uploadBytes(storageRef, blob, metadata);
 
-          case "storage/unknown":
-            // Unknown error occurred, inspect the server response
-            break;
-        }
+        // Obtener la URL de descarga una vez que se haya completado la carga
+        await getDownloadURL((await uploadTask).ref)
+          .then(async (url) => {
+            setProfileURL(url);
+            console.log("hola", profileURL);
+          })
+          .then(async () => {
+            await userNetworking.updateUser(userInfo._id, data);
+            const data2 = await userNetworking.getUserInfo(userInfo._id);
+            dispatch({ type: "SET_USER_INFO", payload: data2 });
+          })
+          .catch((error) => {
+            // A full list of error codes is available at
+            // https://firebase.google.com/docs/storage/web/handle-errors
+            switch (error.code) {
+              case "storage/object-not-found":
+                // File doesn't exist
+                break;
+              case "storage/unauthorized":
+                // User doesn't have permission to access the object
+                break;
+              case "storage/canceled":
+                // User canceled the upload
+                break;
+
+              // ...
+
+              case "storage/unknown":
+                // Unknown error occurred, inspect the server response
+                break;
+            }
+          });
       });
   }
 
@@ -295,11 +303,6 @@ const ProfileSetting = () => {
               title={"Actualizar perfil"}
               key={1}
               onPress={async () => handleUpdateUser()}
-            />
-            <CustomButton
-              title={"a"}
-              key={2}
-              onPress={async () => console.log(state.userID)}
             />
           </View>
         </ScrollView>

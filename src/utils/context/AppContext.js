@@ -21,6 +21,7 @@ export const AppProvider = ({ children }) => {
     KPIProject: [],
     pendingProjectData: [],
     deadLine: "",
+    searchProjectModalVisibility: false,
   };
 
   const appReducer = (state, action) => {
@@ -57,6 +58,8 @@ export const AppProvider = ({ children }) => {
         return { ...state, pendingProjectData: action.payload };
       case "SET_DEADLINE_PROJECT":
         return { ...state, deadLine: action.payload };
+      case "SET_SEARCH_MODAL_VISIBILITY":
+        return { ...state, searchProjectModalVisibility: action.payload };
       default:
         return state;
     }

@@ -181,6 +181,7 @@ export default function Mision() {
             total={projectInfo.total}
             missingTotal={projectInfo.completedMisions}
             daysLeft={projectInfo.daysLeft}
+            projecID={projectInfo._id}
             key={0}
           />
 
