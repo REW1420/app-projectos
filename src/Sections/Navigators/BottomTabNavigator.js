@@ -1,43 +1,30 @@
-import React from "react";
-import { View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Dimensions } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FloatingAction } from "react-native-floating-action";
 import AddButton from "../../components/elements/Buttons/AddButton";
+import { Platform } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import COLORS from "../../utils/COLORS";
 import Profile from "../Screens/Profile";
 import Dashboard from "../Screens/Dashboard";
 import TopTapNavigator from "./TopTapNavigator";
+
 const Tab = createBottomTabNavigator();
 
 export default function BottomTabNavigator() {
-  const actions = [
-    {
-      text: "Accessibility",
-
-      name: "bt_accessibility",
-      position: 2,
-    },
-    {
-      text: "Language",
-
-      name: "bt_language",
-      position: 1,
-    },
-    {
-      text: "Location",
-      name: "bt_room",
-      position: 3,
-    },
-    {
-      text: "Video",
-
-      name: "bt_videocam",
-      position: 4,
-    },
-  ];
   const navigation = useNavigation();
+  const [height, setHeight] = useState(Dimensions.get("screen").height);
+
+  useEffect(() => {
+    if (Platform.OS === "android") {
+      setHeight(Dimensions.get("screen").height - 250);
+    } else {
+      setHeight(Dimensions.get("screen").height / 10);
+    }
+  }, []);
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -45,7 +32,7 @@ export default function BottomTabNavigator() {
         tabBarShowLabel: false,
 
         tabBarStyle: {
-          height: 50,
+          height: height / 10,
           alignItems: "center",
           justifyContent: "center",
           borderTopRightRadius: 15,
@@ -122,7 +109,6 @@ export default function BottomTabNavigator() {
                 }}
                 onPress={() => {
                   navigation.navigate("ProfileSetting");
-                  
                 }}
               />
               <Icon

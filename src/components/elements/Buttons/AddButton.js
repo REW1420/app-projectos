@@ -102,32 +102,7 @@ const AddButton = ({}) => {
               <Icon name="add-outline" size={40} />
             </Animated.View>
           </TouchableWithoutFeedback>
-          <TouchableWithoutFeedback onPress={() => navigation.navigate("News")}>
-            <Animated.View
-              style={[
-                styles.item,
-                opacity,
-                {
-                  transform: [
-                    {
-                      translateX: animation.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [0, -150],
-                      }),
-                    },
-                    {
-                      translateY: animation.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [0, -15],
-                      }),
-                    },
-                  ],
-                },
-              ]}
-            >
-              <Icon name="notifications-outline" size={30} />
-            </Animated.View>
-          </TouchableWithoutFeedback>
+         
           <TouchableWithoutFeedback
             onPress={() => toggleOpened()}
             style={styles.addButton}

@@ -95,11 +95,16 @@ const NewProjectCard = ({ percentage, projectName, total, missingTotal }) => {
 
   const confirmIOSDate = () => {
     setDeadLine(formatDate(date));
+    console.log(formatDateForDB(date))
+    dispatch({
+      type: "SET_PROJECT_DEADLINE",
+      payload: formatDateForDB(date),
+    });
     toggleDatePicker();
   };
   const handleChangeText = (newText) => {
     setTitle(newText);
-
+   
     dispatch({ type: "SET_PROJECT_TITLE", payload: newText });
   };
   return (
@@ -132,18 +137,18 @@ const NewProjectCard = ({ percentage, projectName, total, missingTotal }) => {
                 <View
                   style={{
                     flexDirection: "row",
-                    justifyContent: "space-between",
+                    justifyContent: "space-evenly",
                   }}
                 >
-                  <TouchableOpacity onPress={toggleDatePicker}>
+                  <TouchableOpacity onPress={toggleDatePicker} style={styles.IOSButton}>
                     <Text>Cancelar</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={confirmIOSDate}>
+                  <TouchableOpacity onPress={confirmIOSDate} style={styles.IOSButton}>
                     <Text>Aceptar</Text>
                   </TouchableOpacity>
                 </View>
               )}
-              <Text style={styles.label}>Fehca esperada de finalización</Text>
+              <Text style={styles.label}>Fecha esperada de finalización</Text>
 
               <Pressable
                 onPress={() => {
@@ -221,6 +226,14 @@ const styles = StyleSheet.create({
     height: 120,
     marginTop: -10,
   },
+  IOSButton:{
+    backgroundColor:"#007BFF",
+    borderRadius:10,
+    marginVertical:15,
+    padding:10
+
+  }
+
 });
 const Inputstyles = StyleSheet.create({
   inputTxt: {

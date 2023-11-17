@@ -37,11 +37,16 @@ export default function StackNavigator() {
     projectName: state.newProjectTitle,
     team: { id: state.userID },
     projectOwner: state.userID,
+    deadLine: state.deadLine,
     ...state.newMisionData,
   };
 
   return (
-    <Stack.Navigator initialRouteName="login">
+    <Stack.Navigator initialRouteName="login"
+    screenOptions={{
+      headerTitle:'Atras'
+    }}
+    >
       <Stack.Screen
         name="Login"
         component={Login}

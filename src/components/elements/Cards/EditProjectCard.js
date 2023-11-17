@@ -90,6 +90,10 @@ const EditProjectCard = ({ projectName, DATE }) => {
 
   const confirmIOSDate = () => {
     setDeadLine(formatDate(date));
+    dispatch({
+      type: "SET_PROJECT_DEADLINE",
+      payload: formatDateForDB(date),
+    });
     toggleDatePicker();
   };
   return (
@@ -121,18 +125,24 @@ const EditProjectCard = ({ projectName, DATE }) => {
                 <View
                   style={{
                     flexDirection: "row",
-                    justifyContent: "space-between",
+                    justifyContent: "space-evenly",
                   }}
                 >
-                  <TouchableOpacity onPress={toggleDatePicker}>
+                  <TouchableOpacity
+                    onPress={toggleDatePicker}
+                    style={styles.IOSButton}
+                  >
                     <Text>Cancelar</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={confirmIOSDate}>
+                  <TouchableOpacity
+                    onPress={confirmIOSDate}
+                    style={styles.IOSButton}
+                  >
                     <Text>Aceptar</Text>
                   </TouchableOpacity>
                 </View>
               )}
-              <Text style={styles.label}>Fehca esperada de finalización</Text>
+              <Text style={styles.label}>Fecha esperada de finalización</Text>
 
               <Pressable
                 onPress={() => {
@@ -200,6 +210,12 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: "center",
     justifyContent: "center",
+  },
+  IOSButton: {
+    backgroundColor: "#007BFF",
+    borderRadius: 10,
+    marginVertical: 15,
+    padding: 10,
   },
 });
 const Inputstyles = StyleSheet.create({
