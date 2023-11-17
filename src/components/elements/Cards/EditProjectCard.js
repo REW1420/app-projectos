@@ -5,22 +5,20 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Pressable,
 } from "react-native";
-import { BlurView } from "expo-blur";
-import CustomProgressCircle from "../Particles/CustomProgressCircle";
-import COLORS from "../../../utils/COLORS";
-import DatePicker, { getFormatedDate } from "react-native-modern-datepicker";
-import Modal from "react-native-modal";
+import DateTimePicker from "@react-native-community/datetimepicker";
+
 import AppContext from "../../../utils/context/AppContext";
 
-const EditProjectCard = ({ projectName, date }) => {
+const EditProjectCard = ({ projectName, DATE }) => {
   //app context
   const { dispatch } = React.useContext(AppContext);
   const [title, setTitle] = useState(projectName);
-  const [isVisible, setIsVisible] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState("");
-  const [startedDate, setStartedDate] = useState(date);
-
+  const [deadLine, setDeadLine] = useState(DATE);
+  const [date, setDate] = useState(new Date());
+  const [showPicker, setShowPicker] = useState(false);
   useEffect(() => {
     var date = new Date().getDate(); //Current Date
     var month = new Date().getMonth() + 1; //Current Month
@@ -29,22 +27,70 @@ const EditProjectCard = ({ projectName, date }) => {
     dispatch({ type: "SET_NEW_PROJECT_TITLE", payload: title });
   }, []);
 
-  const toggleModal = () => {
-    setIsVisible(!isVisible);
-  };
-  const handleChangeStartDate = (propDate) => {
-    setStartedDate(propDate);
-  };
-  const today = new Date();
-
-  const startDate = getFormatedDate(
-    today.setDate(today.getDate() + 1),
-    "dd/MM/yyyy"
-  );
   const handleChangeText = (newText) => {
     setTitle(newText);
 
     dispatch({ type: "SET_NEW_PROJECT_TITLE", payload: newText });
+  };
+
+  const toggleDatePicker = () => {
+    setShowPicker(!showPicker);
+  };
+  const onChangeDate = ({ type }, selectedDate) => {
+    if (type == "set") {
+      const currentDate = selectedDate;
+      setDate(currentDate);
+      if (Platform.OS === "android") {
+        toggleDatePicker();
+        setDeadLine(formatDate(currentDate));
+        dispatch({
+          type: "SET_PROJECT_DEADLINE",
+          payload: formatDateForDB(currentDate),
+        });
+        console.log(formatDateForDB(currentDate));
+      }
+    } else {
+      toggleDatePicker();
+    }
+  };
+  const formatDate = (rawDate) => {
+    let date = new Date(rawDate);
+    let year = date.getFullYear();
+    let month = date.getMonth();
+    let day = date.getDate();
+
+    //month = month < 9 ? `0${month + 1}` : month + 1; // Increment month by 1 and add leading zero if necessary
+    day = day < 10 ? `0${day}` : day; // Add leading zero if necessary
+
+    const MONTHS = [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
+    ];
+
+    return `${day} - ${MONTHS[month]} - ${year}`;
+  };
+  const formatDateForDB = (rawDate) => {
+    let date = new Date(rawDate);
+    let year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+
+    return `${year}/${month}/${day}`;
+  };
+
+  const confirmIOSDate = () => {
+    setDeadLine(formatDate(date));
+    toggleDatePicker();
   };
   return (
     <>
@@ -61,44 +107,58 @@ const EditProjectCard = ({ projectName, date }) => {
                 value={title}
               />
             </View>
+            <View>
+              {showPicker && (
+                <DateTimePicker
+                  mode="date"
+                  display="spinner"
+                  value={date}
+                  onChange={onChangeDate}
+                  minimumDate={date}
+                />
+              )}
+              {showPicker && Platform.OS === "ios" && (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <TouchableOpacity onPress={toggleDatePicker}>
+                    <Text>Cancelar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={confirmIOSDate}>
+                    <Text>Aceptar</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              <Text style={styles.label}>Fehca esperada de finalización</Text>
 
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginLeft: 10,
-                marginRight: 10,
-              }}
-            >
-              <Text style={{ fontSize: 15 }}>
-                Fecha esperada de finalización:
-              </Text>
-              <Text
-                style={{
-                  fontWeight: "bold",
-                  textDecorationLine: "underline",
+              <Pressable
+                onPress={() => {
+                  toggleDatePicker();
                 }}
               >
-                {selectedStartDate}
-              </Text>
+                {!showPicker && (
+                  <TextInput
+                    style={{
+                      backgroundColor: "transparent",
+                      height: 50,
+                      fontSize: 14,
+                      fontWeight: "500",
+                      borderRadius: 50,
+                      borderWidth: 1.5,
+                      paddingHorizontal: 20,
+                      marginBottom: 20,
+                      marginVertical: 15,
+                    }}
+                    placeholder={deadLine}
+                    editable={false}
+                    onPressIn={toggleDatePicker}
+                  />
+                )}
+              </Pressable>
             </View>
-
-            <DatePicker
-              mode="calendar"
-              onDateChanged={handleChangeStartDate}
-              minimumDate={startDate}
-              selected={startedDate}
-              onSelectedChange={(date) => setSelectedStartDate(date)}
-              style={{
-                borderRadius: 15,
-                marginVertical: 15,
-              }}
-              options={{
-                borderColor: "rgba(122, 146, 165, 0.1)",
-                mainColor: "black",
-              }}
-            />
           </View>
         </View>
       </View>

@@ -129,4 +129,23 @@ export default class Validation {
       }
     });
   }
+
+  validateNotNullData(data) {
+    for (const key in data) {
+      if (!data[key]) {
+        console.log(`el campo em ${key} esta vacio`);
+        return false;
+      }
+    }
+    console.log("data not null");
+    return true;
+  }
+  validateNotNullMisionData(misionData) {
+    if (misionData.length === 0) {
+      console.log("El campo en mision está vacío.");
+      return false;
+    }
+    console.log("mission not null");
+    return true;
+  }
 }

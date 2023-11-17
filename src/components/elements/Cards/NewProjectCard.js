@@ -8,12 +8,9 @@ import {
   Pressable,
   Platform,
 } from "react-native";
-
-import { getFormatedDate } from "react-native-modern-datepicker";
-
 import DateTimePicker from "@react-native-community/datetimepicker";
 import AppContext from "../../../utils/context/AppContext";
-
+import { useFocusEffect } from "@react-navigation/native";
 const NewProjectCard = ({ percentage, projectName, total, missingTotal }) => {
   //app context
   const { dispatch, state } = React.useContext(AppContext);
@@ -27,6 +24,18 @@ const NewProjectCard = ({ percentage, projectName, total, missingTotal }) => {
   useEffect(() => {
     setDeadLine(formatDate(new Date()));
   }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        console.log("data cleared");
+        dispatch({
+          type: "SET_PROJECT_DEADLINE",
+          payload: null,
+        });
+        dispatch({ type: "SET_PROJECT_TITLE", payload: null });
+      };
+    }, [])
+  );
 
   const toggleDatePicker = () => {
     setShowPicker(!showPicker);
@@ -42,6 +51,7 @@ const NewProjectCard = ({ percentage, projectName, total, missingTotal }) => {
           type: "SET_PROJECT_DEADLINE",
           payload: formatDateForDB(currentDate),
         });
+        console.log(formatDateForDB(currentDate));
       }
     } else {
       toggleDatePicker();

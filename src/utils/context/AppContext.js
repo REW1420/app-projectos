@@ -56,7 +56,7 @@ export const AppProvider = ({ children }) => {
         return { ...state, KPIProject: action.payload };
       case "SET_PENDINGPROJECT_DATA":
         return { ...state, pendingProjectData: action.payload };
-      case "SET_DEADLINE_PROJECT":
+      case "SET_PROJECT_DEADLINE":
         return { ...state, deadLine: action.payload };
       case "SET_SEARCH_MODAL_VISIBILITY":
         return { ...state, searchProjectModalVisibility: action.payload };

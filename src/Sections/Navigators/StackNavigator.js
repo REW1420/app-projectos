@@ -16,12 +16,14 @@ import ToastService from "../../components/elements/Toast/ToastService";
 import { useToast } from "react-native-toast-notifications";
 import EditProject from "../Screens/EditProject";
 import SingIn from "../Screens/SingIn";
+import Validation from "../../utils/Validations/Validation";
 
 const Stack = createStackNavigator();
 export default function StackNavigator() {
   const toast = useToast();
   const ProjectNetworking = new ProjectController(toast);
   const toastService = new ToastService(toast);
+  const validation = new Validation();
   const { state, dispatch } = React.useContext(AppContext);
   const data = {
     projectName: state.projectTitle,
@@ -150,8 +152,14 @@ export default function StackNavigator() {
           headerRight: () => (
             <Pressable
               onPress={() => {
-                ProjectNetworking.createProject(data);
-                //  console.log(data);
+                if (
+                  validation.validateNotNullData(data) &&
+                  validation.validateNotNullMisionData(state.misionData)
+                ) {
+                  ProjectNetworking.createProject(data);
+                } else {
+                  toastService.CustomToast("Un campo esta vacio", "warning");
+                }
               }}
               style={{ marginRight: 15 }}
             >

@@ -123,7 +123,7 @@ export default function EditProject() {
         <EditProjectCard
           projectName={projectInfo.projectName}
           key={0}
-          date={"2001/01/14"}
+          DATE={projectInfo.deadLine}
         />
       </View>
       {inputs}

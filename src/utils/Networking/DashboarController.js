@@ -11,7 +11,7 @@ export default class DashboardController {
       const response = await fetch(BASE_URL + `kpi/get/${user_id}`);
 
       if (!response.ok) {
-        toastService.CustomToast("Error en la peticion egt", "danger");
+        toastService.CustomToast("Error servidor no disponible", "danger");
       }
 
       const resjson = await response.json();

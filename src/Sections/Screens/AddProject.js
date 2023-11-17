@@ -12,7 +12,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import CustomTextInput from "../../components/elements/Inputs/CustomTextInput";
 import NewProjectCard from "../../components/elements/Cards/NewProjectCard";
 import AppContext from "../../utils/context/AppContext";
-
+import { useFocusEffect } from "@react-navigation/native";
 export default function AddProject() {
   const [textValue, setTextValue] = useState("");
   const [numInputs, setNumInputs] = useState(1);
@@ -22,6 +22,14 @@ export default function AddProject() {
   const [tmpMisionData, setTempMisionData] = useState({
     mision: [{}],
   });
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        // Esta función se ejecutará cuando se deje esta pantalla.
+        dispatch({ type: "SET_MISION_DATA", payload: null });
+      };
+    }, [])
+  );
 
   const inputs = [];
   for (let i = 0; i < numInputs; i++) {
