@@ -56,8 +56,6 @@ export default function Dashboard() {
 
   function formatDateString(inputDate) {
     const date = new Date(inputDate);
-
-    const year = date.getFullYear();
     const monthNames = [
       "Enero",
       "Febrero",
@@ -119,7 +117,6 @@ export default function Dashboard() {
             <Text style={{ fontSize: 15 }}>
               Terminados : {kpiProject.isFinished}
             </Text>
-            <Text>{getTodayDate()}</Text>
             <Text style={{ fontSize: 15 }}>
               Pendientes : {kpiProject.pending}
             </Text>

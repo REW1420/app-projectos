@@ -13,27 +13,29 @@ import {
   Pressable,
   TextInput,
   Alert,
+  Button,
 } from "react-native";
 import COLORS from "../../utils/COLORS";
-import Icon from "react-native-vector-icons/Ionicons";
-import SingleItemCard from "../../components/elements/Cards/SingleItemCard";
-import ProfileItemCard from "../../components/elements/Cards/ProfileItemCard";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import AppContext from "../../utils/context/AppContext";
 import { useFocusEffect } from "@react-navigation/native";
 
 import UserController from "../../utils/Networking/UserController";
 import { useToast } from "react-native-toast-notifications";
-import CustomButton from "../../components/elements/Buttons/CustomButton";
+import ItemCard from "../../components/elements/Cards/ItemCard";
+import ProjectController from "../../utils/Networking/ProjectController";
+import { useNavigation } from "@react-navigation/native";
 
 // create a component
 export default function Profile() {
   const toast = useToast();
+  const navigation = useNavigation();
   const userNetworking = new UserController(toast);
+  const projectController = new ProjectController(toast);
   const height = Dimensions.get("screen").height;
   const { state, dispatch } = React.useContext(AppContext);
   const [userInfo, setUserInfo] = React.useState(state.userInfo);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const [projectData, setProjectData] = React.useState(state.projectIOwnData);
 
   const onRefresh = async () => {
     setIsRefreshing(true);
@@ -42,40 +44,24 @@ export default function Profile() {
     dispatch({ type: "SET_USER_INFO", payload: data });
     setIsRefreshing(false);
   };
+  const handleRefreshData = async () => {
+    const data = await userNetworking.getUserInfo(state.userID);
+    setUserInfo(data);
+    dispatch({ type: "SET_USER_INFO", payload: data });
+    const projectInfo = await projectController.GetProjectIOwn(state.userID);
+    setProjectData(projectInfo);
+  };
 
   useFocusEffect(
     React.useCallback(() => {
       // Esta función se ejecutará cuando esta pantalla obtenga el foco.
-
-      onRefresh();
-
+      handleRefreshData();
       return () => {
         // Esta función se ejecutará cuando se deje esta pantalla.
-        console.log("Pantalla deenfocada");
       };
     }, [])
   );
-  const handleSnapPress = React.useCallback((index) => {
-    bottomSheetRef.current?.snapToIndex(index);
-  }, []);
-  const bottomSheetRef = React.useRef(null);
-  const snapPoints = ["30%"];
 
-  const ProfileItemCardData = [
-    { id: 0, title: "DUI", link: userInfo.personalDocs.DUI, docName: "DUI" },
-    {
-      id: 1,
-      title: "Antecedentes penales",
-      link: userInfo.personalDocs.Antecedentes,
-      docName: "Antecedentes",
-    },
-    {
-      id: 2,
-      title: "Solvencia PNC",
-      link: userInfo.personalDocs.Solvencia,
-      docName: "Solvencia",
-    },
-  ];
   return (
     <>
       <ScrollView
@@ -137,27 +123,44 @@ export default function Profile() {
             top: -30,
           }}
         >
-          <Text style={{ fontSize: 30 }}>Datos personales</Text>
+          <Text style={{ fontSize: 30 }}>Mis proyectos</Text>
         </View>
-        <View style={{ marginBottom: 15 }}>
-          {ProfileItemCardData.map((item, index) => (
-            <ProfileItemCard
-              key={index}
-              tittle={item.title}
-              link={item.link}
-              userID={userInfo._id}
-              docName={item.docName}
-            />
-          ))}
-        </View>
-        <BottomSheet
-          index={-1}
-          enablePanDownToClose={true}
-          snapPoints={snapPoints}
-          ref={bottomSheetRef}
+        <View
+          style={{
+            marginHorizontal: 15,
+          }}
         >
-          <BottomSheetView style={{ zIndex: 999 }}></BottomSheetView>
-        </BottomSheet>
+          {projectData && projectData.length > 0 ? (
+            projectData.map((item, index) => (
+              <ItemCard
+                item={item}
+                key={index}
+                navigateFunction={() =>
+                  navigation.navigate("Mision", {
+                    projectInfo: item,
+                  })
+                }
+              />
+            ))
+          ) : (
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: 25,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 20,
+                  textAlign: "center",
+                }}
+              >
+                Crea proyectos para poder administrarlos tú.
+              </Text>
+            </View>
+          )}
+        </View>
       </ScrollView>
     </>
   );

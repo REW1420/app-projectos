@@ -148,4 +148,18 @@ export default class Validation {
     console.log("mission not null");
     return true;
   }
+
+  validateNotNullArray(array) {
+    if (array.length > 0) {
+      for (const key in array) {
+        if (!array[key]) {
+          console.log("El arreglo tiene un elemento vacío");
+          return false;
+        }
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

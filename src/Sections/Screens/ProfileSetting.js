@@ -10,7 +10,6 @@ import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
-import DatePicker, { getFormatedDate } from "react-native-modern-datepicker";
 import { Pressable } from "react-native";
 import CustomButton from "../../components/elements/Buttons/CustomButton";
 import AppContext from "../../utils/context/AppContext";
@@ -22,41 +21,25 @@ import {
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
-import { useNavigation } from "@react-navigation/native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { storage } from "../../utils/Firebase/FirebaseConfig";
 import CustomPasswordInput from "../../components/elements/Inputs/CustomPasswordInput";
 import Icon from "react-native-vector-icons/Ionicons";
 import Validation from "../../utils/Validations/Validation";
 import { useToast } from "react-native-toast-notifications";
+import ToastService from "../../components/elements/Toast/ToastService";
 const validations = new Validation();
 
 const ProfileSetting = () => {
   const toast = useToast();
   const userNetworking = new UserController(toast);
-  const navigation = useNavigation();
+  const toastService = new ToastService(toast);
   const { state, dispatch } = React.useContext(AppContext);
   const userInfo = state.userInfo;
   const [name, setName] = useState(userInfo.name);
   const [email, setEmail] = useState(userInfo.email);
   const [password, setPassword] = useState(userInfo.password);
 
-  const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
-  const today = new Date();
-  const startDate = getFormatedDate(
-    today.setDate(today.getDate() + 1),
-    "YYYY/MM/DD"
-  );
-  const [selectedStartDate, setSelectedStartDate] = useState(userInfo.bornDate);
-  const [startedDate, setStartedDate] = useState(today.toString());
-
-  const handleChangeStartDate = (propDate) => {
-    setStartedDate(propDate);
-  };
-
-  const handleOnPressStartDate = () => {
-    setOpenStartDatePicker(!openStartDatePicker);
-  };
   const [selectedImage, setSelectedImage] = useState(null);
   const handleImageSelection = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -82,7 +65,14 @@ const ProfileSetting = () => {
         // Maneja el error de acuerdo a tus necesidades
       }
     } else {
-      userNetworking.updateUser(userInfo._id, data);
+      if (!validations.validateNotNullArray([data.name, data.email])) {
+        toastService.CustomToast(
+          "Los campos no puedes estar vacios",
+          "warning"
+        );
+      } else {
+        userNetworking.updateUser(userInfo._id, data);
+      }
     }
   }
 
@@ -296,6 +286,7 @@ const ProfileSetting = () => {
               title={"Actualizar contraseña"}
               key={0}
               onPress={() => handleSnapPress(0)}
+              width={"100%"}
             />
           </View>
           <View style={{ marginVertical: 10 }}>
@@ -303,6 +294,7 @@ const ProfileSetting = () => {
               title={"Actualizar perfil"}
               key={1}
               onPress={async () => handleUpdateUser()}
+              width={"100%"}
             />
           </View>
         </ScrollView>
@@ -368,6 +360,7 @@ const ProfileSetting = () => {
           </View>
           <CustomButton
             title={"Actualizar contraseña"}
+            width={"80%"}
             onPress={() => handleUpdatePassword()}
           />
         </BottomSheetView>

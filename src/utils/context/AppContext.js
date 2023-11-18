@@ -22,6 +22,7 @@ export const AppProvider = ({ children }) => {
     pendingProjectData: [],
     deadLine: "",
     searchProjectModalVisibility: false,
+    projectIOwnData: [],
   };
 
   const appReducer = (state, action) => {
@@ -60,6 +61,8 @@ export const AppProvider = ({ children }) => {
         return { ...state, deadLine: action.payload };
       case "SET_SEARCH_MODAL_VISIBILITY":
         return { ...state, searchProjectModalVisibility: action.payload };
+      case "SET_PROJECTIOWN_DATA":
+        return { ...state, projectIOwnData: action.payload };
       default:
         return state;
     }

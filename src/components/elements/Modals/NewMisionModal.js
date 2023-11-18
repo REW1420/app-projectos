@@ -1,12 +1,13 @@
-import { View, Text, Button, StyleSheet, TextInput } from "react-native";
+import { View, Text, StyleSheet, TextInput } from "react-native";
 import React from "react";
 import Modal from "react-native-modal";
 import CustomButton from "../Buttons/CustomButton";
-import CustomTextInput from "../Inputs/CustomTextInput";
+
 import COLORS from "../../../utils/COLORS";
 import ProjectController from "../../../utils/Networking/ProjectController";
 
 import { useToast } from "react-native-toast-notifications";
+import Validation from "../../../utils/Validations/Validation";
 export default function NewMisionModal({
   isModalVisible,
   back,
@@ -15,6 +16,8 @@ export default function NewMisionModal({
   projectID,
 }) {
   const [visible, setVisible] = React.useState(isModalVisible);
+  const [hasError, setHasError] = React.useState(false);
+  const validation = new Validation();
   const [misionName, setMisionName] = React.useState("");
   const [description, setDescription] = React.useState("");
   const toast = useToast();
@@ -33,10 +36,21 @@ export default function NewMisionModal({
     status: "Pendiente",
   };
   const handleAddMision = async () => {
-    const res = await ProjecNetworking.updateAddNewMision(data, projectID);
-    console.log("res", res);
-    back();
+    if (!validation.validateNotNullArray([data.misionName, data.description])) {
+      setHasError(true);
+    } else {
+      await ProjecNetworking.updateAddNewMision(data, projectID);
+      setHasError(false);
+      handleClearData();
+      back();
+    }
   };
+
+  function handleClearData() {
+    setDescription("");
+    setMisionName("");
+  }
+
   return (
     <Modal
       isVisible={isModalVisible}
@@ -45,7 +59,13 @@ export default function NewMisionModal({
     >
       <View style={styles.modalContainer}>
         <Text style={styles.modalTitle}>{title}</Text>
-
+        {hasError && (
+          <View>
+            <Text style={{ color: "red" }}>
+              Los campos no pueden estar vacios
+            </Text>
+          </View>
+        )}
         <TextInput
           placeholder="Titulo"
           style={styles.inputTxt}
@@ -64,7 +84,13 @@ export default function NewMisionModal({
           onChangeText={(text) => handleChangeText(text, setDescription)}
         />
         <View style={styles.buttonContainer}>
-          <CustomButton title={"Cancelar"} onPress={back} />
+          <CustomButton
+            title={"Cancelar"}
+            onPress={() => {
+              handleClearData();
+              back();
+            }}
+          />
           <CustomButton title={"Aceptar"} onPress={handleAddMision} />
         </View>
       </View>

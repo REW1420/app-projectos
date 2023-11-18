@@ -27,12 +27,12 @@ const NewProjectCard = ({ percentage, projectName, total, missingTotal }) => {
   useFocusEffect(
     React.useCallback(() => {
       return () => {
-        console.log("data cleared");
         dispatch({
           type: "SET_PROJECT_DEADLINE",
           payload: null,
         });
         dispatch({ type: "SET_PROJECT_TITLE", payload: null });
+        
       };
     }, [])
   );
@@ -95,7 +95,7 @@ const NewProjectCard = ({ percentage, projectName, total, missingTotal }) => {
 
   const confirmIOSDate = () => {
     setDeadLine(formatDate(date));
-    console.log(formatDateForDB(date))
+    console.log(formatDateForDB(date));
     dispatch({
       type: "SET_PROJECT_DEADLINE",
       payload: formatDateForDB(date),
@@ -104,7 +104,7 @@ const NewProjectCard = ({ percentage, projectName, total, missingTotal }) => {
   };
   const handleChangeText = (newText) => {
     setTitle(newText);
-   
+
     dispatch({ type: "SET_PROJECT_TITLE", payload: newText });
   };
   return (
@@ -140,10 +140,16 @@ const NewProjectCard = ({ percentage, projectName, total, missingTotal }) => {
                     justifyContent: "space-evenly",
                   }}
                 >
-                  <TouchableOpacity onPress={toggleDatePicker} style={styles.IOSButton}>
+                  <TouchableOpacity
+                    onPress={toggleDatePicker}
+                    style={styles.IOSButton}
+                  >
                     <Text>Cancelar</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={confirmIOSDate} style={styles.IOSButton}>
+                  <TouchableOpacity
+                    onPress={confirmIOSDate}
+                    style={styles.IOSButton}
+                  >
                     <Text>Aceptar</Text>
                   </TouchableOpacity>
                 </View>
@@ -226,14 +232,12 @@ const styles = StyleSheet.create({
     height: 120,
     marginTop: -10,
   },
-  IOSButton:{
-    backgroundColor:"#007BFF",
-    borderRadius:10,
-    marginVertical:15,
-    padding:10
-
-  }
-
+  IOSButton: {
+    backgroundColor: "#007BFF",
+    borderRadius: 10,
+    marginVertical: 15,
+    padding: 10,
+  },
 });
 const Inputstyles = StyleSheet.create({
   inputTxt: {

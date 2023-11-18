@@ -21,6 +21,8 @@ import ToastService from "../../components/elements/Toast/ToastService";
 import { Pressable } from "react-native";
 import NoInternetConnectionModal from "../../components/elements/Modals/NoInternetConnectionModal";
 import ResetPasswordModal from "../../components/elements/Modals/ResetPasswordModal";
+import ProjectController from "../../utils/Networking/ProjectController";
+
 export default function Login() {
   const { dispatch } = React.useContext(AppContext);
   const { state } = React.useContext(ConfigContext);
@@ -28,6 +30,8 @@ export default function Login() {
   const toast = useToast();
   const userNetworking = new UserController(toast);
   const dashboardNetworking = new DashboardController(toast);
+  const projecNetworking = new ProjectController(toast);
+
   const toastService = new ToastService(toast);
   const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
@@ -38,6 +42,9 @@ export default function Login() {
     const kpiData = await dashboardNetworking.getDataFromID(
       "6516094b91620132c9e11d81"
     );
+    const projectIOwnData = await projecNetworking.GetProjectIOwn("asd");
+
+    dispatch({ type: "SET_PROJECTIOWN_DATA", payload: projectIOwnData });
 
     const usefulData = kpiData.kpi.map((item) => ({
       count: item.count,

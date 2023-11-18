@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "app-pasantias",
-    "slug": "app-pasantias",
+    "name": "Metriklass",
+    "slug": "metriklass",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      
+      "image": "./assets/app-splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#562a5e",
       "plugins": [

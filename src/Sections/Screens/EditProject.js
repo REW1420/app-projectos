@@ -1,19 +1,10 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  TextInput,
-  Pressable,
-  StyleSheet,
-} from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import React, { useState, useRef, useContext } from "react";
 import { useRoute } from "@react-navigation/native";
 import EditProjectCard from "../../components/elements/Cards/EditProjectCard";
-import CustomButton from "../../components/elements/Buttons/CustomButton";
 import AppContext from "../../utils/context/AppContext";
-import Icon from "react-native-vector-icons/Ionicons";
 import CustomTextInput from "../../components/elements/Inputs/CustomTextInput";
-
+import { useFocusEffect } from "@react-navigation/native";
 export default function EditProject() {
   const route = useRoute();
   const projectInfo = route.params?.projectInfo;
@@ -28,10 +19,17 @@ export default function EditProject() {
     mision: projectInfo.mision,
   });
 
-  React.useEffect(() => {
-    dispatch({ type: "SET_NEW_PROJECT_DATA", payload: initialMisionValues });
-    dispatch({ type: "SET_PROJECT_ID", payload: projectInfo._id });
-  }, []);
+  React.useEffect(() => {}, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      dispatch({ type: "SET_NEW_PROJECT_DATA", payload: initialMisionValues });
+      dispatch({ type: "SET_PROJECT_ID", payload: projectInfo._id });
+      return () => {
+        dispatch({ type: "SET_NEW_PROJECT_TITLE", payload: "" });
+        dispatch({ type: "SET_PROJECT_DEADLINE", payload: "" });
+      };
+    }, [])
+  );
   const inputs = [];
   for (let i = 0; i < numInputs; i++) {
     misionValues = initialMisionValues[i];
@@ -42,12 +40,6 @@ export default function EditProject() {
           style={{ marginTop: 15, flexDirection: "row", ...styles.container }}
         >
           <Text style={{ fontSize: 20 }}>Mision {i + 1}</Text>
-          <Pressable
-            onPress={() => removeInput(i)}
-            style={{ marginHorizontal: 15 }}
-          >
-            <Icon name="remove-circle-outline" size={30} color="red" />
-          </Pressable>
         </View>
         <View
           style={{

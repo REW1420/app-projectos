@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, Pressable, Button } from "react-native";
+import { Text, Pressable, Platform } from "react-native";
 import "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import Login from "../Screens/Login";
@@ -42,10 +42,11 @@ export default function StackNavigator() {
   };
 
   return (
-    <Stack.Navigator initialRouteName="login"
-    screenOptions={{
-      headerTitle:'Atras'
-    }}
+    <Stack.Navigator
+      initialRouteName="login"
+      screenOptions={{
+        headerTitle: Platform.OS === "ios" ? "Atras" : null,
+      }}
     >
       <Stack.Screen
         name="Login"
@@ -61,7 +62,7 @@ export default function StackNavigator() {
         name="Mision"
         component={Mision}
         options={{
-          headerTitle: "",
+          headerTitle: "Proyecto",
           headerRight: () => {
             if (state.isOwner === true) {
               return state.FABvisibility === false ? (
@@ -87,10 +88,6 @@ export default function StackNavigator() {
               return state.isInTeam ? (
                 <Pressable
                   onPress={() => {
-                    /**   ProjectNetworking.updateJoinTeam(
-                      state.projectID,
-                      state.userID
-                    ); */
                     dispatch({
                       type: "SET_ALERTMODAL_VISIBILITY",
                       payload: true,
@@ -143,7 +140,13 @@ export default function StackNavigator() {
         component={News}
         options={{ headerTitle: "" }}
       />
-      <Stack.Screen name="ProfileSetting" component={ProfileSetting} />
+      <Stack.Screen
+        name="ProfileSetting"
+        component={ProfileSetting}
+        options={{
+          headerTitle: "Editar perfil",
+        }}
+      />
       <Stack.Screen
         name="SearchProject"
         component={SearchProject}
@@ -163,7 +166,10 @@ export default function StackNavigator() {
                 ) {
                   ProjectNetworking.createProject(data);
                 } else {
-                  toastService.CustomToast("Un campo esta vacio", "warning");
+                  toastService.CustomToast(
+                    "Los campos no pueden estar vacios",
+                    "warning"
+                  );
                 }
               }}
               style={{ marginRight: 15 }}
@@ -184,7 +190,14 @@ export default function StackNavigator() {
           headerRight: () => (
             <Pressable
               onPress={() => {
-                ProjectNetworking.updateProject(state.projectID, newData);
+                if (!validation.validateNotNullArray([newData.projectName])) {
+                  toastService.CustomToast(
+                    "Los datos no pueden quedar vacios",
+                    "warning"
+                  );
+                } else {
+                  ProjectNetworking.updateProject(state.projectID, newData);
+                }
               }}
               style={{ marginRight: 15 }}
             >
@@ -195,6 +208,7 @@ export default function StackNavigator() {
               </Text>
             </Pressable>
           ),
+          headerTitle: "Editar Proyecto",
         }}
       />
       <Stack.Screen

@@ -38,7 +38,7 @@ export default class ProjectController {
     const toastService = new ToastService(this._toast);
     try {
       const res = await fetch(
-        `https://metriklass-api-qgrw-dev.fl0.io/projects/update-status/${_projectID}/${_misionID}`,
+        BASE_URL + `projects/update-status/${_projectID}/${_misionID}`,
         {
           method: "PUT",
           headers: {
@@ -321,6 +321,44 @@ export default class ProjectController {
       }
       const resJson = await response.json();
       console.log(resJson);
+    } catch (error) {
+      console.error("Error en:", error);
+      throw error;
+    }
+  }
+
+  async GetProjectIOwn(userID) {
+    try {
+      const response = await fetch(BASE_URL + `projects/own/${userID}`);
+      if (response.status === 404) {
+        return undefined;
+      }
+      const resJson = await response.json();
+      console.log(resJson);
+      return resJson;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async DeleteSingleMision(projecID, misionID, userID) {
+    try {
+      const toastService = new ToastService(this._toast);
+      const response = await fetch(
+        BASE_URL + `projects/delete-mision/${projecID}/${misionID}/${userID}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        toastService.CustomToast("Error al eliminar la mision", "error");
+      } else {
+        toastService.CustomToast("Mision eliminada", "success");
+      }
+      const res = await response.json();
+      return res;
     } catch (error) {
       console.error("Error en:", error);
       throw error;

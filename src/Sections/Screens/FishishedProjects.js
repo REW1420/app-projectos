@@ -7,7 +7,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  SafeAreaView,
   RefreshControl,
 } from "react-native";
 import CustomListItem from "../../components/elements/Particles/CustomListItem";

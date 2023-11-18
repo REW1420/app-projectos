@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, RefreshControl } from "react-native";
-import React, { useContext } from "react";
+import React from "react";
 import { styles } from "../../utils/Styles";
 import PercentageCard from "../../components/elements/Cards/PercentageCard";
 import { useRoute } from "@react-navigation/native";
@@ -17,16 +17,22 @@ import ProjectController from "../../utils/Networking/ProjectController";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useToast } from "react-native-toast-notifications";
 import ToastService from "../../components/elements/Toast/ToastService";
-import { useEffect } from "react";
+import Icon from "react-native-vector-icons/Ionicons";
 import DashboardController from "../../utils/Networking/DashboarController";
-import { Button } from "react-native";
+import { Pressable } from "react-native";
+
 export default function Mision() {
   const toast = useToast();
   const toastService = new ToastService(toast);
   const ProjecNetworking = new ProjectController(toast);
   const dashboardNetworking = new DashboardController(toast);
+
   const navigation = useNavigation();
   const [showFinishedOptions, setShowFinishedOptions] = React.useState(false);
+  const [deleteNisionModalVisibility, setDeleteMisionModalVisibility] =
+    React.useState(false);
+  const [misionID, setMisionID] = React.useState("");
+  const [isMissionFinished, setIsMissionFinished] = React.useState(false);
   useFocusEffect(
     React.useCallback(() => {
       // Esta función se ejecutará cuando esta pantalla obtenga el foco.
@@ -55,6 +61,7 @@ export default function Mision() {
   const handleSnapPress2 = React.useCallback((index) => {
     bottomSheetRef2.current?.snapToIndex(index);
   }, []);
+
   const snapPoints = ["30%"];
 
   React.useEffect(() => {
@@ -156,8 +163,23 @@ export default function Mision() {
       _mision_id
     );
     setProjectInfo(response);
-    console.log(response);
+    handleCloseBottomSheet();
   };
+
+  const toggleDeleteMisionAlert = () => {
+    setDeleteMisionModalVisibility(!deleteNisionModalVisibility);
+  };
+  const handleDeleteMision = async () => {
+    const res = await ProjecNetworking.DeleteSingleMision(
+      projectInfo._id,
+      misionID,
+      state.userID
+    );
+    setProjectInfo(res);
+    toggleDeleteMisionAlert();
+    handleCloseBottomSheet();
+  };
+  const handleCloseBottomSheet = () => bottomSheetRef.current.close();
 
   return (
     <React.Fragment>
@@ -245,6 +267,7 @@ export default function Mision() {
                     }
                     onPressSnap={() => {
                       handleSnapPress(0);
+                      setMisionID(item._id);
                       setItemDescription(item.description);
                       setShowFinishedOptions(false);
                       SETMISIONID(item._id);
@@ -273,6 +296,7 @@ export default function Mision() {
                     onPressAction={() => {
                       handleSnapPress(0);
                       setItemDescription(item.description);
+                      setIsMissionFinished(item.isFinished);
                       setShowFinishedOptions(true);
                       SETMISIONID(item._id);
                     }}
@@ -395,9 +419,22 @@ export default function Mision() {
               justifyContent: "center",
               alignItems: "center",
               marginTop: 15,
+              flexDirection: "row",
             }}
           >
             <Text style={{ fontSize: 20 }}>Descipción de la Mision</Text>
+            {state.isOwner &&
+              !projectInfo.isProjectClose &&
+              !isMissionFinished && (
+                <Pressable
+                  style={{
+                    marginLeft: 10,
+                  }}
+                  onPress={() => toggleDeleteMisionAlert()}
+                >
+                  <Icon name="trash-outline" size={30} color={"red"} />
+                </Pressable>
+              )}
           </View>
           <Text style={{ margin: 15 }}>{itemDescription}</Text>
           <View style={{ marginTop: 15 }}>
@@ -426,20 +463,28 @@ export default function Mision() {
                   alignItems: "center",
                 }}
               >
-                <CustomButton
-                  title={"Marcar Trabajando"}
-                  onPress={() => {
-                    handleUpdateMisionStatus(MISIONID, "Trabajando", false);
-                  }}
-                />
+                {!projectInfo.isProjectClose && (
+                  <React.Fragment>
+                    <CustomButton
+                      title={"Marcar Trabajando"}
+                      onPress={() => {
+                        handleUpdateMisionStatus(MISIONID, "Trabajando", false);
+                      }}
+                    />
 
-                <CustomButton
-                  title={"Marcar Completado"}
-                  onPress={async () => {
-                    await handleUpdateMisionStatus(MISIONID, "Terminado", true);
-                    dashboardNetworking.addContribution(state.userID);
-                  }}
-                />
+                    <CustomButton
+                      title={"Marcar Completado"}
+                      onPress={async () => {
+                        await handleUpdateMisionStatus(
+                          MISIONID,
+                          "Terminado",
+                          true
+                        );
+                        dashboardNetworking.addContribution(state.userID);
+                      }}
+                    />
+                  </React.Fragment>
+                )}
               </View>
             )}
           </View>
@@ -490,6 +535,13 @@ export default function Mision() {
           </View>
         </BottomSheetView>
       </BottomSheet>
+      <AlertModal
+        isModalVisible={deleteNisionModalVisibility}
+        back={toggleDeleteMisionAlert}
+        handleDelete={handleDeleteMision}
+        title={"¿Esta seguro de eliminar la mision?"}
+        key={0}
+      />
     </React.Fragment>
   );
 }

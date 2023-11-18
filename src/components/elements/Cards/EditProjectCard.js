@@ -15,16 +15,13 @@ const EditProjectCard = ({ projectName, DATE }) => {
   //app context
   const { dispatch } = React.useContext(AppContext);
   const [title, setTitle] = useState(projectName);
-  const [selectedStartDate, setSelectedStartDate] = useState("");
   const [deadLine, setDeadLine] = useState(DATE);
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
+  
   useEffect(() => {
-    var date = new Date().getDate(); //Current Date
-    var month = new Date().getMonth() + 1; //Current Month
-    var year = new Date().getFullYear();
-    setSelectedStartDate(`${date}/${month}/${year}`);
     dispatch({ type: "SET_NEW_PROJECT_TITLE", payload: title });
+    dispatch({ type: "SET_PROJECT_DEADLINE", payload: deadLine });
   }, []);
 
   const handleChangeText = (newText) => {

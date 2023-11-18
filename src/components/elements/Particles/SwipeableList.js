@@ -1,8 +1,9 @@
-import { View, Text, SafeAreaView } from "react-native";
+import { View, SafeAreaView } from "react-native";
 import React from "react";
 import { ListItem, Button } from "@rneui/themed";
 import Icon from "react-native-vector-icons/Ionicons";
 import ProjectController from "../../../utils/Networking/ProjectController";
+import AppContext from "../../../utils/context/AppContext";
 
 export default function SwipeableList({
   tittle,
@@ -11,6 +12,7 @@ export default function SwipeableList({
   onPressSnap,
   updateAction,
 }) {
+  const { state } = React.useContext(AppContext);
   return (
     <SafeAreaView>
       <ListItem.Swipeable
@@ -19,6 +21,7 @@ export default function SwipeableList({
         leftWidth={80}
         rightWidth={90}
         minSlideWidth={40}
+        
         rightContent={(reset) => (
           <View>
             <Button
