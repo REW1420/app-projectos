@@ -1,7 +1,8 @@
 import { StyleSheet, View, TextInput, Pressable } from "react-native";
 import React, { useState } from "react";
 import COLORS from "../../../utils/COLORS";
-
+import {} from 'react-native-paper/'
+ 
 export default function CustomPasswordInput({
   Placeholder,
   _onChangeText,

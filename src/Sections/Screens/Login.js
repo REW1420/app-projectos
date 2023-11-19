@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  SafeAreaView,
 } from "react-native";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -22,11 +23,14 @@ import { Pressable } from "react-native";
 import NoInternetConnectionModal from "../../components/elements/Modals/NoInternetConnectionModal";
 import ResetPasswordModal from "../../components/elements/Modals/ResetPasswordModal";
 import ProjectController from "../../utils/Networking/ProjectController";
+import PaperTextInput from "../../components/elements/Inputs/PaperTextInput";
+import Loader from "../../components/elements/Loaders/Loader";
+import Validation from "../../utils/Validations/Validation";
 
 export default function Login() {
   const { dispatch } = React.useContext(AppContext);
   const { state } = React.useContext(ConfigContext);
-  const configContext = React.useContext(ConfigContext);
+  const validations = new Validation();
   const toast = useToast();
   const userNetworking = new UserController(toast);
   const dashboardNetworking = new DashboardController(toast);
@@ -36,13 +40,15 @@ export default function Login() {
   const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
   const navigation = useNavigation();
+  const [loading, setLoading] = React.useState(false);
   const [resetPasswordModal, setResetPasswordModal] = useState(false);
-  async function handleGetUserInfo() {
-    const data = await userNetworking.getUserInfo("6516094b91620132c9e11d81");
-    const kpiData = await dashboardNetworking.getDataFromID(
-      "6516094b91620132c9e11d81"
-    );
-    const projectIOwnData = await projecNetworking.GetProjectIOwn("asd");
+  const [isEmailValid, setEmailValid] = useState();
+  const [isPasswordValid, setPasswordValid] = useState();
+
+  async function handleGetUserInfo(userID) {
+    const data = await userNetworking.getUserInfo(userID);
+    const kpiData = await dashboardNetworking.getDataFromID(userID);
+    const projectIOwnData = await projecNetworking.GetProjectIOwn(userID);
 
     dispatch({ type: "SET_PROJECTIOWN_DATA", payload: projectIOwnData });
 
@@ -63,80 +69,106 @@ export default function Login() {
   const toggleResetPasswordModal = () => {
     setResetPasswordModal(!resetPasswordModal);
   };
+
+  async function handleValidate() {
+    try {
+      const [emailIsValid, passwordIsValid] = await Promise.all([
+        validations.validateEmail(user),
+        validations.validateNotNull(pwd),
+      ]);
+
+      setEmailValid(emailIsValid);
+      setPasswordValid(passwordIsValid);
+    } catch (error) {
+      console.error("Error en la validación:", error);
+    }
+
+    if (isEmailValid !== undefined && isPasswordValid !== undefined) {
+      if (isEmailValid.status && isPasswordValid.status) {
+        handleLogin();
+      }
+    }
+  }
+  const handleLogin = async () => {
+    setLoading(true);
+    try {
+      const res = await userNetworking.Login({
+        email: user,
+        password: pwd,
+      });
+      if (res !== undefined) {
+        console.log(res);
+        handleGetUserInfo(res.profile._id);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
-    <ScrollView style={styles.initB}>
-      <View style={styles.secondary_backgroud}></View>
-      <View style={styles.primary_backgroud}>
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            marginLeft: 16,
-            marginRight: 16,
-            marginBottom: 16,
-            height: 200,
-          }}
-        ></View>
-
-        <View style={styles.textContainer}>
-          <Text style={styles.hint_text}>Bienvenido</Text>
-        </View>
-        <CustomTextInput
-          placeholder={"Correo"}
-          secureTextEntry={false}
-          onChangeText={(text) => {
-            setUser(text);
-          }}
-        />
-
-        <CustomPasswordInput
-          Placeholder="Contraseña"
-          _onChangeText={(text) => setPwd(text)}
-        />
-
-        <View style={{ display: "flex", marginLeft: "auto", marginRight: 30 }}>
-          <TouchableOpacity onPress={toggleResetPasswordModal}>
-            <Text style={styles.forgot_button}>¿Olvidó la contraseña?</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={{ marginTop: -20 }}>
+    <SafeAreaView style={{ backgroundColor: COLORS.white, flex: 1 }}>
+      <Loader key={2} visible={loading} />
+      <View style={{ paddingTop: 50, paddingHorizontal: 20 }}>
+        <Text style={{ color: COLORS.black, fontSize: 40, fontWeight: "bold" }}>
+          Iniciar sesion
+        </Text>
+        <Text style={{ color: COLORS.grey, fontSize: 18, marginVertical: 10 }}>
+          Bienvenido!, Ingresa tus credenciales para iniciar sesion
+        </Text>
+        <View style={{ marginVertical: 20 }}>
+          <PaperTextInput
+            iconName="mail-outline"
+            label="Email"
+            placeholder="Ingresa tu correo"
+            autoCapitalize={"none"}
+            keyboardType={"email-address"}
+            error={isEmailValid !== undefined ? isEmailValid.message : null}
+            OnChangeText={(text) => setUser(text)}
+          />
+          <PaperTextInput
+            iconName="lock-closed-outline"
+            label="Contraseña"
+            placeholder="Ingresa tu contraseña"
+            password
+            autoCapitalize={"none"}
+            error={
+              isPasswordValid !== undefined ? isPasswordValid.message : null
+            }
+            OnChangeText={(text) => setPwd(text)}
+          />
+          <View style={{ display: "flex", marginLeft: "auto" }}>
+            <TouchableOpacity onPress={toggleResetPasswordModal}>
+              <Text style={styles.forgot_button}>¿Olvidó la contraseña?</Text>
+            </TouchableOpacity>
+          </View>
           <CustomButton
-            width={"80%"}
+            width={"100%"}
             title={"Iniciar sesion"}
             onPress={async () => {
-              await handleGetUserInfo();
+              await handleValidate();
             }}
           />
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: 15,
+            }}
+          >
+            <Text style={{ fontSize: 15 }}>No tienes cuenta?, </Text>
+            <Pressable
+              onPress={() => {
+                navigation.navigate("singIn");
+              }}
+            >
+              <Text style={{ fontSize: 15, fontWeight: "bold" }}>
+                Crea una aquí
+              </Text>
+            </Pressable>
+          </View>
         </View>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            marginVertical: 15,
-          }}
-        >
-          <Text>O inicia sesion con</Text>
-        </View>
-      </View>
-
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Text style={{ fontSize: 15 }}>Si eres nuevo </Text>
-        <Pressable
-          onPress={() => {
-            navigation.navigate("singIn");
-          }}
-        >
-          <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-            Crea una cuenta
-          </Text>
-        </Pressable>
       </View>
       <NoInternetConnectionModal key={0} hasConnection={!state.isAppReady} />
       <ResetPasswordModal
@@ -144,7 +176,7 @@ export default function Login() {
         toggleModal={toggleResetPasswordModal}
         key={1}
       />
-    </ScrollView>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({

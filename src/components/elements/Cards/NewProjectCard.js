@@ -51,7 +51,7 @@ const NewProjectCard = ({ percentage, projectName, total, missingTotal }) => {
           type: "SET_PROJECT_DEADLINE",
           payload: formatDateForDB(currentDate),
         });
-        console.log(formatDateForDB(currentDate));
+        
       }
     } else {
       toggleDatePicker();
@@ -95,7 +95,7 @@ const NewProjectCard = ({ percentage, projectName, total, missingTotal }) => {
 
   const confirmIOSDate = () => {
     setDeadLine(formatDate(date));
-    console.log(formatDateForDB(date));
+    
     dispatch({
       type: "SET_PROJECT_DEADLINE",
       payload: formatDateForDB(date),

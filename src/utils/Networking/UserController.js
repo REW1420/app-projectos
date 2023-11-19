@@ -87,7 +87,7 @@ export default class UserController {
       if (!response.ok) {
         toastService.CustomToast("No se pudo iniciar sesion", "danger");
       } else {
-        toastService.CustomToast(`Bienvenido ${serverRes.name}`, "success");
+        toastService.CustomToast(`Bienvenido!`, "success");
       }
       return serverRes;
     } catch (error) {

@@ -7,8 +7,6 @@ import {
   ScrollView,
   RefreshControl,
 } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
-import ProgressBar from "../../components/elements/Particles/ProgressBar";
 import COLORS from "../../utils/COLORS";
 import CustomSearchbar from "../../components/elements/Particles/CustomSearchbar";
 import ItemCard from "../../components/elements/Cards/ItemCard";
@@ -23,12 +21,9 @@ export default function PendingProjects() {
   const ProjecNetworking = new ProjectController(toast);
   const { state, dispatch } = React.useContext(AppContext);
   const navigation = useNavigation();
-
   const [isLoading, setIsLoading] = useState(false);
-
   const [data2, setData2] = useState([]);
   const [refreshing, setRefreshing] = React.useState(false);
-
   const handleGetData = async () => {
     const projects = await ProjecNetworking.getProjectImIn(state.userID);
     setData2(projects);
@@ -36,8 +31,6 @@ export default function PendingProjects() {
       state.userID
     );
     dispatch({ type: "SET_PENDINGPROJECT_DATA", payload: projectsFinished });
-
-    //console.log(projects);
     setIsLoading(true);
     setRefreshing(false);
   };
@@ -69,11 +62,9 @@ export default function PendingProjects() {
 
   useFocusEffect(
     React.useCallback(() => {
-      // Esta función se ejecutará cuando esta pantalla obtenga el foco.
       console.log("Pantalla enfocada");
       handleGetData();
       return () => {
-        // Esta función se ejecutará cuando se deje esta pantalla.
         console.log("se desenfocada");
         handleGetData();
       };
@@ -92,49 +83,64 @@ export default function PendingProjects() {
           onChange={handleSearch}
           query={query}
         />
-        {isLoading ? (
-          filteredData.length > 0 ? (
-            filteredData.map((item, i) => (
-              <ItemCard
-                key={i}
-                item={item}
-                navigateFuntion={() => {
-                  navigation.navigate("Mision", {
-                    projectInfo: item,
-                  });
-                  handleGetData();
+        {data2.length >= 1 ? (
+          isLoading ? (
+            filteredData.length > 0 ? (
+              filteredData.map((item, i) => (
+                <ItemCard
+                  key={i}
+                  item={item}
+                  navigateFuntion={() => {
+                    navigation.navigate("Mision", {
+                      projectInfo: item,
+                    });
+                    handleGetData();
+                  }}
+                />
+              ))
+            ) : notFoundItem === true ? (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: 25,
                 }}
-              />
-            ))
-          ) : notFoundItem === true ? (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-                marginTop: 25,
-              }}
-            >
-              <Text style={{ fontSize: 20, textAlign: "center" }}>
-                Ups, No se encontraron resultados
-              </Text>
-            </View>
+              >
+                <Text style={{ fontSize: 20, textAlign: "center" }}>
+                  Ups, No se encontraron resultados
+                </Text>
+              </View>
+            ) : (
+              data2.map((item, i) => (
+                <ItemCard
+                  item={item}
+                  key={i}
+                  navigateFuntion={() => {
+                    navigation.navigate("Mision", {
+                      projectInfo: item,
+                    });
+                    handleGetData();
+                  }}
+                />
+              ))
+            )
           ) : (
-            data2.map((item, i) => (
-              <ItemCard
-                item={item}
-                key={i}
-                navigateFuntion={() => {
-                  navigation.navigate("Mision", {
-                    projectInfo: item,
-                  });
-                  handleGetData();
-                }}
-              />
-            ))
+            <ItemShimer />
           )
         ) : (
-          <ItemShimer />
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 25,
+            }}
+          >
+            <Text style={{ fontSize: 20, textAlign: "center" }}>
+              Ups, No hay proyectos pendinetes
+            </Text>
+          </View>
         )}
       </View>
     </ScrollView>

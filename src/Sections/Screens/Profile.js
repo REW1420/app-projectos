@@ -29,7 +29,10 @@ import { useNavigation } from "@react-navigation/native";
 export default function Profile() {
   const toast = useToast();
   const navigation = useNavigation();
+
   const userNetworking = new UserController(toast);
+
+  
   const projectController = new ProjectController(toast);
   const height = Dimensions.get("screen").height;
   const { state, dispatch } = React.useContext(AppContext);

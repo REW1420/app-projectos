@@ -9,4 +9,11 @@ export default {
   inactive_icon: "#628C72",
   active_icon: "#263138",
   inputBorderColor: "black",
+  white: "#fff",
+  black: "#000",
+  blue: "#5D5FEE",
+  grey: "#BABBC3",
+  light: "#F3F4FB",
+  darkBlue: "#7978B5",
+  red: "red",
 };

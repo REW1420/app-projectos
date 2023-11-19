@@ -28,6 +28,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import Validation from "../../utils/Validations/Validation";
 import { useToast } from "react-native-toast-notifications";
 import ToastService from "../../components/elements/Toast/ToastService";
+import PaperTextInput from "../../components/elements/Inputs/PaperTextInput";
 const validations = new Validation();
 
 const ProfileSetting = () => {
@@ -326,31 +327,29 @@ const ProfileSetting = () => {
             >
               Actualizar contraseña
             </Text>
-            <Pressable
-              onPress={() => setSecure(!secure)}
-              style={{ marginTop: 10 }}
-            >
-              <Icon
-                name={secure ? "eye-outline" : "eye-off-outline"}
-                size={35}
-              />
-            </Pressable>
           </View>
 
           <View>
-            <CustomPasswordInput
-              Placeholder={"Contraseña actual"}
-              secure={secure}
-              _onChangeText={(text) => handleChange("currentPassword", text)}
+            <PaperTextInput
+              iconName="lock-closed-outline"
+              label="Contraseña"
+              placeholder="Ingresa tu contraseña actual"
+              password
+              autoCapitalize={"none"}
+              OnChangeText={(text) => handleChange("currentPassword", text)}
+            />
+            <PaperTextInput
+              iconName="lock-closed-outline"
+              label="Repetir contraseña"
+              placeholder="Ingrese su nueva contraseña"
+              password
+              autoCapitalize={"none"}
+              OnChangeText={(text) => handleChange("newPassword", text)}
             />
             {promiseError !== undefined ? (
               <Text>{promiseError.message}</Text>
             ) : null}
-            <CustomPasswordInput
-              Placeholder={"Contraseña nueva"}
-              secure={secure}
-              _onChangeText={(text) => handleChange("newPassword", text)}
-            />
+
             {promiseError !== undefined ? (
               <Text>{promiseError.message}</Text>
             ) : null}

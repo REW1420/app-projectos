@@ -8,6 +8,7 @@ import ToastService from "../Toast/ToastService";
 import { useToast } from "react-native-toast-notifications";
 import Validation from "../../../utils/Validations/Validation";
 import AuthController from "../../../utils/Networking/AuthController";
+import PaperTextInput from "../Inputs/PaperTextInput";
 export default function ResetPasswordModal({ isVisible, toggleModal }) {
   const toas = useToast();
   const projectNetworking = new ProjectController(toas);
@@ -20,19 +21,21 @@ export default function ResetPasswordModal({ isVisible, toggleModal }) {
     setEmail(text);
   };
   const handleSendEmail = async () => {
-    await validation
-      .validateEmail(email)
-      .then((res) => {
-        setRes(res);
-      })
-      .then(() => {
-        if (res !== undefined) {
-          if (res.status) {
-            authNetworking.sendOneTimeResetPassword(email);
-          }
-        }
-      });
+    try {
+      const res = await validation.validateEmail(email);
+
+      if (res !== undefined && res.status) {
+        authNetworking.sendOneTimeResetPassword(email);
+        toggleModal();
+        setEmail("");
+      }
+
+      setRes(res);
+    } catch (error) {
+      console.error("Error during email validation:", error);
+    }
   };
+
   let inputColor = "gray";
   if (res === undefined) {
     inputColor = "gray";
@@ -50,9 +53,6 @@ export default function ResetPasswordModal({ isVisible, toggleModal }) {
         style={{
           backgroundColor: "white",
           borderRadius: 10,
-
-          alignItems: "center",
-          justifyContent: "center",
         }}
       >
         <View
@@ -63,49 +63,35 @@ export default function ResetPasswordModal({ isVisible, toggleModal }) {
           }}
         >
           <Text style={{ fontSize: 25 }}>Restaurar contraseña</Text>
-          <View
-            style={{
-              alignItems: "center",
-              marginTop: 15,
-              flexDirection: "row",
+        </View>
+        <View style={{ marginHorizontal: 15 }}>
+          <PaperTextInput
+            iconName="mail-outline"
+            label="Correo"
+            placeholder="Ingresa tu correo asociado"
+            autoCapitalize={"none"}
+            keyboardType={"email-address"}
+            OnChangeText={(text) => handleChangeText(text)}
+            error={res !== undefined ? res.message : null}
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: 15,
+          }}
+        >
+          <CustomButton
+            title={"Cancelar"}
+            onPress={() => {
+              setEmail("");
+              setRes(undefined);
+              toggleModal();
             }}
-          >
-            <TextInput
-              placeholder="Ingrese su correo"
-              style={{
-                width: 200,
-                height: 40,
-                borderColor: inputColor,
-                borderWidth: 1,
-                padding: 10,
-                borderRadius: 15,
-              }}
-              keyboardType="email-address"
-              value={email}
-              autoCapitalize="none"
-              onChangeText={(text) => handleChangeText(text)}
-            />
-          </View>
-
-          <View style={{ marginVertical: 15 }}>
-            {res !== undefined ? (
-              !res.status ? (
-                <Text style={{ color: "red" }}>{res.message}</Text>
-              ) : null
-            ) : null}
-          </View>
-
-          <View style={{ flexDirection: "row" }}>
-            <CustomButton
-              title={"Cancelar"}
-              onPress={() => {
-                setEmail("");
-                setRes(undefined);
-                toggleModal();
-              }}
-            />
-            <CustomButton title={"Enviar correo"} onPress={handleSendEmail} />
-          </View>
+          />
+          <CustomButton title={"Enviar correo"} onPress={handleSendEmail} />
         </View>
       </View>
     </Modal>

@@ -3,7 +3,8 @@ import {
   Text,
   View,
   ScrollView,
-  TouchableOpacity,
+  SafeAreaView,
+  Pressable,
 } from "react-native";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -16,6 +17,7 @@ import UserController from "../../utils/Networking/UserController";
 import Validation from "../../utils/Validations/Validation";
 import { useToast } from "react-native-toast-notifications";
 import ToastService from "../../components/elements/Toast/ToastService";
+import PaperTextInput from "../../components/elements/Inputs/PaperTextInput";
 
 const validations = new Validation();
 export default function SingIn() {
@@ -61,158 +63,166 @@ export default function SingIn() {
   const [isOccupationValid, setOccupationValid] = useState();
 
   async function handleValidate() {
-    const emailPromise = validations.validateEmail(formData.email);
-    const passwordPromise = validations.validatePassword(
-      formData.password,
-      formData.confirmPassword
-    );
-    const namePromise = validations.validateName(formData.email);
-    const notNullPromise = validations.validateNotNull(formData.occupation);
-      
-    Promise.all([emailPromise, passwordPromise, namePromise, notNullPromise])
-      .then(
-        ([emailIsValid, passwordIsValid, nameIsValid, occupationIsValid]) => {
-          setEmailValid(emailIsValid);
-          setPasswordValid(passwordIsValid);
-          setNameValid(nameIsValid);
-          setOccupationValid(occupationIsValid);
-        }
-      )
-      .catch((error) => {
-        console.error("Error en la validación:", error);
-      });
+    try {
+      const [emailIsValid, passwordIsValid, nameIsValid, occupationIsValid] =
+        await Promise.all([
+          validations.validateEmail(formData.email),
+          validations.validatePassword(
+            formData.password,
+            formData.confirmPassword
+          ),
+          validations.validateName(formData.name),
+          validations.validateNotNull(formData.occupation),
+        ]);
+
+      setEmailValid(emailIsValid);
+      setPasswordValid(passwordIsValid);
+      setNameValid(nameIsValid);
+      setOccupationValid(occupationIsValid);
+    } catch (error) {
+      console.error("Error en la validación:", error);
+    }
   }
 
   async function handleIsFormOK() {
-    const newUser = {
-      name: formData.name,
-      email: formData.email,
-      occupation: formData.occupation,
-      password: formData.confirmPassword,
-    };
-    if (
-      formData.confirmPassword === "" &&
-      formData.email === "" &&
-      formData.name == "" &&
-      formData.occupation === "" &&
-      formData.password === ""
-    ) {
+    const { name, email, occupation, confirmPassword, password } = formData;
+
+    if (!name || !email || !occupation || !confirmPassword || !password) {
       toastService.CustomToast("Los datos no pueden estar vacíos", "warning");
+      return;
     }
+
     await handleValidate();
+
+    const validations = [
+      isEmailValid.status,
+      isNameValid.status,
+      isOccupationValid.status,
+      isPasswordValid.status,
+    ];
+
     if (
-      isEmailValid.status === true &&
-      isNameValid.status === true &&
-      isOccupationValid.status === true &&
-      isPasswordValid.status === true
+      validations.every((status) => status !== undefined && status === true)
     ) {
       try {
+        const newUser = {
+          name,
+          email,
+          occupation,
+          password: confirmPassword,
+        };
+
         const res = await userNetworking.createUser(newUser);
-        res ? navigation.navigate("Login") : null;
+        res && navigation.navigate("Login");
       } catch (error) {
         console.error(error);
       }
     } else {
-      return;
+      console.log("No hay datos o algunos datos no son válidos");
     }
   }
+
   return (
-    <ScrollView style={styles.initB}>
-      <View style={styles.secondary_backgroud}></View>
-      <View style={styles.primary_backgroud}>
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            marginLeft: 16,
-            marginRight: 16,
+    <SafeAreaView style={{ backgroundColor: COLORS.white, flex: 1 }}>
+      <ScrollView
+        contentContainerStyle={{ paddingTop: 50, paddingHorizontal: 20 }}
+      >
+        <Text style={{ color: COLORS.black, fontSize: 40, fontWeight: "bold" }}>
+          Registrarse
+        </Text>
+        <Text style={{ color: COLORS.grey, fontSize: 18, marginVertical: 10 }}>
+          Ingresa tus datos para crear una cuenta
+        </Text>
+        <View style={{ marginVertical: 20 }}>
+          <PaperTextInput
+            autoCapitalize={"none"}
+            keyboardType={"email-address"}
+            iconName="mail-outline"
+            label="Correo"
+            placeholder="Ingresa tu correo personal"
+            OnChangeText={(text) => {
+              handleChange("email", text);
+            }}
+            error={isEmailValid !== undefined ? isEmailValid.message : null}
+          />
 
-            height: 100,
-          }}
-        >
-          <Text style={styles.hint_text}>Crea una nueva cuenta</Text>
-        </View>
-        <CustomTextInputForm
-          placeholder={"Nombre"}
-          autoCapitalize="words"
-          isValid={isNameValid === undefined ? null : isNameValid.status}
-          secureTextEntry={false}
-          onChangeText={(text) => {
-            handleChange("name", text);
-          }}
-        />
-        {isNameValid === undefined ? null : <Text>{isNameValid.message}</Text>}
-        <CustomTextInputForm
-          placeholder={"Correo"}
-          secureTextEntry={false}
-          isValid={isEmailValid === undefined ? null : isEmailValid.status}
-          onChangeText={(text) => {
-            handleChange("email", text);
-          }}
-        />
-        {isEmailValid === undefined ? null : (
-          <Text>{isEmailValid.message}</Text>
-        )}
-        <CustomTextInputForm
-          placeholder={"Ocupacion"}
-          secureTextEntry={true}
-          isValid={
-            isOccupationValid === undefined ? null : isOccupationValid.status
-          }
-          autoCapitalize="sentences"
-          onChangeText={(text) => {
-            handleChange("occupation", text);
-          }}
-        />
-        {isOccupationValid === undefined ? null : (
-          <Text>{isOccupationValid.message}</Text>
-        )}
-        <CustomTextInputForm
-          placeholder={"Contraseña"}
-          isValid={
-            isPasswordValid === undefined ? null : isPasswordValid.status
-          }
-          secureTextEntry={true}
-          onChangeText={(text) => {
-            handleChange("password", text);
-          }}
-        />
-        {isPasswordValid === undefined ? null : (
-          <Text>{isPasswordValid.message}</Text>
-        )}
-        <CustomTextInputForm
-          placeholder={"Confirmar contraseña"}
-          isValid={
-            isPasswordValid === undefined ? null : isPasswordValid.status
-          }
-          secureTextEntry={true}
-          onChangeText={(text) => {
-            handleChange("confirmPassword", text);
-          }}
-        />
-
-        {isPasswordValid === undefined ? null : (
-          <Text>{isPasswordValid.message}</Text>
-        )}
-        <View style={{ gap: 20, marginVertical: 10 }}>
+          <PaperTextInput
+            autoCapitalize={"words"}
+            iconName="body-outline"
+            label="Nombre"
+            placeholder="Ingresa tu nombre completo"
+            OnChangeText={(text) => {
+              handleChange("name", text);
+            }}
+            error={isNameValid !== undefined ? isNameValid.message : null}
+          />
+          <PaperTextInput
+            iconName="body-outline"
+            label="Ocupación"
+            placeholder="Ingresa tu ocupación (ejm programador jr)"
+            OnChangeText={(text) => {
+              handleChange("occupation", text);
+            }}
+            autoCapitalize={"sentences"}
+            error={
+              isOccupationValid !== undefined ? isOccupationValid.message : null
+            }
+          />
+          <PaperTextInput
+            iconName={"lock-closed-outline"}
+            label="Contraseña"
+            placeholder="Debe contener mayusculas y numeros"
+            password
+            OnChangeText={(text) => {
+              handleChange("password", text);
+            }}
+            autoCapitalize={"none"}
+            error={
+              isPasswordValid !== undefined ? isPasswordValid.message : null
+            }
+          />
+          <PaperTextInput
+            iconName={"lock-closed-outline"}
+            label="Confirmar contraseña"
+            placeholder="Deben coincidir la contraseña"
+            password
+            error={
+              isPasswordValid !== undefined ? isPasswordValid.message : null
+            }
+            OnChangeText={(text) => {
+              handleChange("confirmPassword", text);
+            }}
+            autoCapitalize={"none"}
+          />
           <CustomButton
-            title={"Crear nueva cuenta"}
-            width={"80%"}
+            title={"Crear cuenta"}
+            width={"100%"}
             onPress={async () => {
               await handleIsFormOK();
             }}
           />
-
-          <CustomButton
-            title={"Cancelar"}
-            width={"80%"}
-            onPress={async () => {
-              navigation.navigate("Login");
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: 15,
             }}
-          />
+          >
+            <Text style={{ fontSize: 15 }}>Si ya tiene una cuenta, </Text>
+            <Pressable
+              onPress={() => {
+                navigation.navigate("Login");
+              }}
+            >
+              <Text style={{ fontSize: 15, fontWeight: "bold" }}>
+                Inicie sesion
+              </Text>
+            </Pressable>
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({

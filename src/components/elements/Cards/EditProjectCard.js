@@ -44,7 +44,7 @@ const EditProjectCard = ({ projectName, DATE }) => {
           type: "SET_PROJECT_DEADLINE",
           payload: formatDateForDB(currentDate),
         });
-        console.log(formatDateForDB(currentDate));
+        
       }
     } else {
       toggleDatePicker();

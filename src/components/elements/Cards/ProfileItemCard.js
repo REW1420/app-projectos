@@ -26,7 +26,7 @@ export default function ProfileItemCard({
     setModalVisible(!modalVisible);
   };
   const handleUploadPDF = async () => {
-    console.log("selecionado pdf");
+    
 
     await DocumentPicker.getDocumentAsync({
       type: "application/pdf",
