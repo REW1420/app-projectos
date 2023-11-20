@@ -7,7 +7,6 @@ export default function xhrGetBlob(uri) {
         resolve(xhr.response);
       }
     };
-
     xhr.open("GET", uri);
     xhr.responseType = "blob";
     xhr.send();

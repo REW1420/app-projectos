@@ -24,7 +24,6 @@ export default function NewMisionModal({
   const ProjecNetworking = new ProjectController(toast);
   const handleChangeText = (text, state) => {
     state(text);
-    console.log(data);
   };
   const [newID, setNewID] = React.useState("");
 
@@ -49,13 +48,20 @@ export default function NewMisionModal({
   function handleClearData() {
     setDescription("");
     setMisionName("");
+    setHasError(false);
   }
 
   return (
     <Modal
       isVisible={isModalVisible}
-      onBackButtonPress={back}
-      onBackdropPress={back}
+      onBackButtonPress={() => {
+        back();
+        setHasError(false);
+      }}
+      onBackdropPress={() => {
+        back();
+        setHasError(false);
+      }}
     >
       <View style={styles.modalContainer}>
         <Text style={styles.modalTitle}>{title}</Text>
@@ -88,6 +94,7 @@ export default function NewMisionModal({
             title={"Cancelar"}
             onPress={() => {
               handleClearData();
+
               back();
             }}
           />

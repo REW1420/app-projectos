@@ -32,7 +32,6 @@ export default function Profile() {
 
   const userNetworking = new UserController(toast);
 
-  
   const projectController = new ProjectController(toast);
   const height = Dimensions.get("screen").height;
   const { state, dispatch } = React.useContext(AppContext);
@@ -138,7 +137,7 @@ export default function Profile() {
               <ItemCard
                 item={item}
                 key={index}
-                navigateFunction={() =>
+                navigateFuntion={() =>
                   navigation.navigate("Mision", {
                     projectInfo: item,
                   })

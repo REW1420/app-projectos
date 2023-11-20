@@ -42,7 +42,7 @@ export default function SearchProjectModal() {
     );
 
     if (res.status === 404) {
-      console.log("no se encontro protecto");
+    
       setProjectFoundError(true);
     } else if (res.status === 200) {
       setProjectData(res);
@@ -86,7 +86,7 @@ export default function SearchProjectModal() {
           totalTeam={projectData.team.length}
           key={0}
           projecID={queryID}
-          handleJoinTeam={() => console.log("join team")}
+          handleJoinTeam={() => handleJoinTeam()}
           toggleModal={toggleModal}
           userID={state.userID}
           teamData={projectData.team}

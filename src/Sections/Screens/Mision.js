@@ -36,7 +36,7 @@ export default function Mision() {
   useFocusEffect(
     React.useCallback(() => {
       // Esta función se ejecutará cuando esta pantalla obtenga el foco.
-      console.log("Pantalla enfocada");
+
       return () => {
         // Esta función se ejecutará cuando se deje esta pantalla.
         dispatch({ type: "SET_FAB_VISIBILITY", payload: false });
@@ -79,9 +79,7 @@ export default function Mision() {
       dispatch({ type: "SET_IS_OWNER", payload: false });
     }
   };
-  const handleIsInTeam = () => {
-    console.log(projectInfo.isMemberInTeam);
-  };
+  const handleIsInTeam = () => {};
   const [isModalVisible, setModalVisible] = React.useState(false);
   const [isModalVisibleStop, setModalVisibleStop] = React.useState(false);
   const [isModalVisibleStart, setModalVisibleStart] = React.useState(false);
@@ -97,7 +95,7 @@ export default function Mision() {
   };
   const handleDelete = async () => {
     const res = await ProjecNetworking.deleteFromID(projectInfo._id);
-    console.log(res);
+
     toggleModal();
     navigation.navigate("Proyectos");
   };
@@ -106,7 +104,7 @@ export default function Mision() {
       projectInfo._id,
       true
     );
-    console.log(res);
+
     toggleModal();
     navigation.navigate("Proyectos");
   };
@@ -118,7 +116,6 @@ export default function Mision() {
     );
 
     setProjectInfo(res);
-    console.log(res);
   };
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -132,7 +129,7 @@ export default function Mision() {
       projectInfo._id,
       false
     );
-    console.log(res);
+
     toggleModal();
     navigation.navigate("Proyectos");
   };
@@ -382,7 +379,7 @@ export default function Mision() {
         handleDelete={() => handleCloseProject()}
       />
       <AlertModal
-        title={"¿Estas seguro de continuar el projecto?"}
+        title={"¿Estas seguro de reaunar el projecto?"}
         isModalVisible={isModalVisibleStart}
         back={() => toggleModalStart()}
         handleDelete={() => handleStartProject()}

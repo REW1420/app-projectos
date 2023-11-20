@@ -6,8 +6,8 @@ export default class AuthController {
   }
 
   async sendOneTimeResetPassword(email) {
+    const toastService = new ToastService(this._toast);
     try {
-      const toastService = new ToastService(this._toast);
       const res = await fetch(BASE_URL + "auth/reset", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -27,7 +27,6 @@ export default class AuthController {
       }
     } catch (error) {
       toastService.CustomToast("Algo a salido mal", "error");
-      console.log(error);
     }
   }
 }

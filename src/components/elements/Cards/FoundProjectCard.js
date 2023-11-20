@@ -44,6 +44,7 @@ const FoundProjectCard = ({
             <CustomProgressCircle progress={percentage} />
           </View>
         </View>
+
         <View style={{ marginTop: 15, ...styles.rowFlexCenter }}>
           <CustomButton title={"Cancelar"} onPress={toggleModal} />
           {isMemberInTeam === false ? (
@@ -51,6 +52,11 @@ const FoundProjectCard = ({
           ) : userID === projectOwner ? null : (
             <CustomButton title={"Abandonar"} onPress={handleLeftTeam} />
           )}
+        </View>
+        <View style={{ margin: 5 }}>
+          <Text style={{ color: "gray" }}>
+            * El proyecto es administrado por el usuario, no se puede abadnonar
+          </Text>
         </View>
       </View>
     </>

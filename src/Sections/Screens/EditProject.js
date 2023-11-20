@@ -90,7 +90,7 @@ export default function EditProject() {
       [field]: value,
     };
     dispatch({ type: "SET_NEW_PROJECT_DATA", payload: updateData });
-    console.log(updateData);
+    
     setTextValue(value);
   };
   const addInput = () => {

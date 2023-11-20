@@ -10,7 +10,10 @@ export default class UserController {
       const response = await fetch(BASE_URL + `user/get/${user_id}`);
       const userInfo = await response.json();
       if (!response.ok) {
-        toastService.CustomToast("No se pudo iniciar sesion", "danger");
+        toastService.CustomToast(
+          "No se pudo iniciar sesion, credenciales incorrectas",
+          "danger"
+        );
       }
 
       return userInfo;
@@ -37,10 +40,7 @@ export default class UserController {
         toastService.CustomToast("Actualizado", "success");
       }
       const newProject = await response.json();
-
-      console.log("Respuesta del servidor:", newProject);
     } catch (error) {
-      console.error("Error en updateUser:", error);
       throw error;
     }
   }
@@ -58,7 +58,7 @@ export default class UserController {
       });
 
       const newProject = await response.json();
-      console.log("Respuesta del servidor:", newProject);
+
       if (!response.ok) {
         toastService.CustomToast(newProject.message, "danger");
         return false;
@@ -85,13 +85,15 @@ export default class UserController {
 
       const serverRes = await response.json();
       if (!response.ok) {
-        toastService.CustomToast("No se pudo iniciar sesion", "danger");
+        toastService.CustomToast(
+          "No se pudo iniciar sesion, credenciales incorrectas",
+          "danger"
+        );
       } else {
         toastService.CustomToast(`Bienvenido!`, "success");
       }
       return serverRes;
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
@@ -112,7 +114,6 @@ export default class UserController {
         toastService.CustomToast(`Datos actualizados`, "success");
       }
       const serverRes = await response.json();
-      console.log(serverRes);
     } catch (error) {
       throw error;
     }

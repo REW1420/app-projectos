@@ -97,7 +97,7 @@ export default function Login() {
         password: pwd,
       });
       if (res !== undefined) {
-        console.log(res);
+        
         handleGetUserInfo(res.profile._id);
       }
     } catch (error) {
@@ -109,7 +109,7 @@ export default function Login() {
   return (
     <SafeAreaView style={{ backgroundColor: COLORS.white, flex: 1 }}>
       <Loader key={2} visible={loading} />
-      <View style={{ paddingTop: 50, paddingHorizontal: 20 }}>
+      <View style={{ paddingTop: 50, paddingHorizontal: 20, marginTop: 15 }}>
         <Text style={{ color: COLORS.black, fontSize: 40, fontWeight: "bold" }}>
           Iniciar sesion
         </Text>

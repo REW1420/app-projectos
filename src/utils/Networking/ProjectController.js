@@ -27,8 +27,6 @@ export default class ProjectController {
       }
 
       const newProject = await response.json();
-
-      console.log("Respuesta del servidor:", newProject);
     } catch (error) {
       console.error("Error en createProject:", error);
       throw error;
@@ -57,7 +55,7 @@ export default class ProjectController {
         );
       }
       const response = await res.json();
-      console.log(response);
+
       return response.project;
     } catch (error) {
       console.error("Error en actualizar estado:", error);
@@ -251,10 +249,7 @@ export default class ProjectController {
         toastService.CustomToast("Hecho", "success");
       }
       const project = await response.json();
-      //console.log(project);
-    } catch (error) {
-      console.error("Error en:", error);
-    }
+    } catch (error) {}
   }
 
   async updateProject(projectID, newData) {
@@ -272,7 +267,6 @@ export default class ProjectController {
         toastService.CustomToast("Actualizado", "success");
       }
       const project = await response.json();
-      console.log(project);
     } catch (error) {
       console.error("Error en:", error);
       throw error;
@@ -298,7 +292,6 @@ export default class ProjectController {
         toastService.CustomToast("Creado", "success");
       }
       const project = await response.json();
-      console.log(project);
     } catch (error) {
       console.error("Error en:", error);
       throw error;
@@ -320,7 +313,6 @@ export default class ProjectController {
         toastService.CustomToast("Hecho", "success");
       }
       const resJson = await response.json();
-      console.log(resJson);
     } catch (error) {
       console.error("Error en:", error);
       throw error;
@@ -334,10 +326,9 @@ export default class ProjectController {
         return undefined;
       }
       const resJson = await response.json();
-      console.log(resJson);
+
       return resJson;
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }

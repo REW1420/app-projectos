@@ -15,11 +15,9 @@ export default class DashboardController {
       }
 
       const resjson = await response.json();
-      console.log(resjson);
+
       return resjson;
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   }
 
   async addContribution(user_id) {
@@ -30,9 +28,7 @@ export default class DashboardController {
         toastService.CustomToast("Error en la peticion", "danger");
       }
       const resjson = await response.json();
-      console.log(resjson);
-    } catch (error) {
-      console.log(error);
-    }
+      
+    } catch (error) {}
   }
 }

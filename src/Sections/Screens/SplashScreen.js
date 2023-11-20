@@ -14,19 +14,18 @@ export default function SplashScreen() {
 
   useEffect(() => {
     async function prepare() {
-      console.log("preparing");
+      
       await new Promise((resolve) => {
         setTimeout(resolve, 2000);
         validateInternetConnection();
-        console.log(hasIntenerConnection);
-        console.log(isServerReady);
+        
       });
     }
     prepare();
   }, []);
 
   const validateInternetConnection = async () => {
-    console.log("entro");
+    
     await NetInfo.fetch().then((res) => {
       setHasInternetConnection(res.isConnected);
     });

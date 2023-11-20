@@ -39,7 +39,7 @@ export default function ProfileItemCard({
   async function uploadPDF(uri) {
     toastService.CustomToast("Subiendo PDF", "normal");
 
-    console.log("subiendo pdf");
+    
 
     const storageRef = ref(storage, `users/personalDocs/${userID}/${tittle}`);
     const metadata = {
@@ -49,7 +49,7 @@ export default function ProfileItemCard({
     // Obtener el blob de la URL de manera sincrónica
     const blob = await xhrGetBlob(uri);
     let URL;
-    //  console.log(blob);
+   
 
     // Subir el blob a Firebase Storage
     const uploadTask = uploadBytes(storageRef, blob, metadata);
@@ -57,7 +57,6 @@ export default function ProfileItemCard({
     // Obtener la URL de descarga una vez que se haya completado la carga
     await getDownloadURL((await uploadTask).ref)
       .then((url) => {
-        // console.log("hola", url);
         toastService.CustomToast("Se subio el archivo", "succed");
 
         URL = url;

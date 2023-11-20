@@ -114,9 +114,7 @@ export default function StackNavigator() {
                         state.userID,
                         toast
                       );
-                    } catch (error) {
-                      console.log(error);
-                    }
+                    } catch (error) {}
                   }}
                   style={{ marginRight: 15 }}
                 >
@@ -190,9 +188,16 @@ export default function StackNavigator() {
           headerRight: () => (
             <Pressable
               onPress={() => {
-                if (!validation.validateNotNullArray([newData.projectName])) {
+                const projectNameNotEmpty = validation.validateNotNullArray([
+                  newData.projectName,
+                ]);
+                const misionDataValid = validation.validateEditMisionData(
+                  state.newMisionData.mision
+                );
+
+                if (!projectNameNotEmpty || !misionDataValid) {
                   toastService.CustomToast(
-                    "Los datos no pueden quedar vacios",
+                    "Los datos no pueden quedar vacíos",
                     "warning"
                   );
                 } else {

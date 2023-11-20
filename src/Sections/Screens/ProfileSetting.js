@@ -10,7 +10,6 @@ import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Pressable } from "react-native";
 import CustomButton from "../../components/elements/Buttons/CustomButton";
 import AppContext from "../../utils/context/AppContext";
 import xhrGetBlob from "../../utils/Firebase/FirebaseFuntions";
@@ -20,6 +19,7 @@ import {
   uploadBytes,
   getDownloadURL,
   deleteObject,
+  list,
 } from "firebase/storage";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { storage } from "../../utils/Firebase/FirebaseConfig";
@@ -42,6 +42,12 @@ const ProfileSetting = () => {
   const [password, setPassword] = useState(userInfo.password);
 
   const [selectedImage, setSelectedImage] = useState(null);
+  const data = {
+    name: name,
+    email: email,
+    password: password,
+    profilePhoto: profileURL,
+  };
   const handleImageSelection = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -49,84 +55,93 @@ const ProfileSetting = () => {
       aspect: [4, 4],
       quality: 1,
     });
-
-    setSelectedImage(result.assets[0].uri);
-    console.log(selectedImage);
+    if (result.canceled) {
+      return;
+    } else {
+      setSelectedImage(result.assets[0].uri);
+    }
   };
   const [profileURL, setProfileURL] = React.useState(userInfo.profilePhoto);
 
   async function handleUpdateUser() {
-    if (selectedImage !== null) {
-      try {
-        await uploadImage(selectedImage, userInfo._id);
-
-        // Aquí puedes realizar otras acciones con 'data'
-      } catch (error) {
-        console.error("Error al cargar la imagen:", error);
-        // Maneja el error de acuerdo a tus necesidades
-      }
-    } else {
-      if (!validations.validateNotNullArray([data.name, data.email])) {
-        toastService.CustomToast(
-          "Los campos no puedes estar vacios",
-          "warning"
-        );
+    try {
+      if (selectedImage !== null) {
+        uploadImagev2(selectedImage);
       } else {
-        userNetworking.updateUser(userInfo._id, data);
+        if (validations.validateNotNullArray([data.name, data.email])) {
+          await userNetworking.updateUser(userInfo._id, data);
+          const updatedUserInfo = await userNetworking.getUserInfo(
+            userInfo._id
+          );
+          dispatch({ type: "SET_USER_INFO", payload: updatedUserInfo });
+        } else {
+          toastService.CustomToast(
+            "Los campos no pueden estar vacíos",
+            "warning"
+          );
+        }
       }
+    } catch (error) {
+      console.error("Error updating user:", error);
+      toastService.CustomToast("Error al actualizar el usuario", "danger");
     }
   }
 
-  async function uploadImage(uri, user_id) {
-    const storageRef = ref(storage, `users/profilePhotos/${user_id}`);
+  async function uploadImage(uri) {
+    const storageRef = ref(storage, `users/profilePhotos/${userInfo._id}`);
     const metadata = {
       contentType: "image/jpg",
     };
 
-    await deleteObject(storageRef)
-      .then(() => {
-        console.log("object deleted");
+    const blob = await xhrGetBlob(uri);
+
+    //upload photo
+    const uploadTask = uploadBytes(storageRef, blob, metadata);
+
+    await getDownloadURL((await uploadTask).ref)
+      .then(async (url) => {
+        setProfileURL(url);
       })
       .then(async () => {
-        const blob = await xhrGetBlob(uri);
-
-        const uploadTask = uploadBytes(storageRef, blob, metadata);
-
-        // Obtener la URL de descarga una vez que se haya completado la carga
-        await getDownloadURL((await uploadTask).ref)
-          .then(async (url) => {
-            setProfileURL(url);
-            console.log("hola", profileURL);
-          })
-          .then(async () => {
-            await userNetworking.updateUser(userInfo._id, data);
-            const data2 = await userNetworking.getUserInfo(userInfo._id);
-            dispatch({ type: "SET_USER_INFO", payload: data2 });
-          })
-          .catch((error) => {
-            // A full list of error codes is available at
-            // https://firebase.google.com/docs/storage/web/handle-errors
-            switch (error.code) {
-              case "storage/object-not-found":
-                // File doesn't exist
-                break;
-              case "storage/unauthorized":
-                // User doesn't have permission to access the object
-                break;
-              case "storage/canceled":
-                // User canceled the upload
-                break;
-
-              // ...
-
-              case "storage/unknown":
-                // Unknown error occurred, inspect the server response
-                break;
-            }
-          });
+        await userNetworking.updateUser(userInfo._id, data);
+        const data2 = await userNetworking.getUserInfo(userInfo._id);
+        dispatch({ type: "SET_USER_INFO", payload: data2 });
+      })
+      .catch((error) => {
+        switch (error.code) {
+          case "storage/object-not-found":
+            break;
+          case "storage/unauthorized":
+            break;
+          case "storage/canceled":
+            break;
+          case "storage/unknown":
+            break;
+        }
       });
   }
+  function uploadImagev2(uri) {
+    const storageRef = ref(storage, `users/profilePhotos/${userInfo._id}`);
+    deleteObject(storageRef)
+      .then(() => {
+        uploadImage(uri);
+      })
+      .catch((error) => {
+        // Uh-oh, an error occurred!
 
+        switch (error.code) {
+          case "storage/object-not-found":
+            uploadImage(uri);
+            break;
+          case "storage/unauthorized":
+            break;
+          case "storage/canceled":
+            break;
+          case "storage/unknown":
+            break;
+        }
+      });
+  }
   const [isModalVisible, setIsModalVisible] = React.useState(false);
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
@@ -160,7 +175,6 @@ const ProfileSetting = () => {
           if (res.status) {
             const res = await userNetworking.updatePass(passData, state.userID);
             setServerError(res);
-            console.log(res);
           }
         });
     } catch (error) {
@@ -168,12 +182,6 @@ const ProfileSetting = () => {
     }
   };
 
-  const data = {
-    name: name,
-    email: email,
-    password: password,
-    profilePhoto: profileURL,
-  };
   return (
     <React.Fragment>
       <SafeAreaView

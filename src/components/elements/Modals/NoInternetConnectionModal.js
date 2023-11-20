@@ -41,7 +41,6 @@ export default function NoInternetConnectionModal({ hasConnection }) {
             width={"100%"}
             onPress={() => {
               NetInfo.fetch().then((state) => {
-                console.log(state.isConnected);
                 dispatch({ type: "SET_APP_READY", payload: state.isConnected });
               });
             }}

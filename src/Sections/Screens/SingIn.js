@@ -118,7 +118,6 @@ export default function SingIn() {
         console.error(error);
       }
     } else {
-      console.log("No hay datos o algunos datos no son válidos");
     }
   }
 
@@ -127,9 +126,13 @@ export default function SingIn() {
       <ScrollView
         contentContainerStyle={{ paddingTop: 50, paddingHorizontal: 20 }}
       >
-        <Text style={{ color: COLORS.black, fontSize: 40, fontWeight: "bold" }}>
-          Registrarse
-        </Text>
+        <View style={{ marginTop: 15 }}>
+          <Text
+            style={{ color: COLORS.black, fontSize: 40, fontWeight: "bold" }}
+          >
+            Registrarse
+          </Text>
+        </View>
         <Text style={{ color: COLORS.grey, fontSize: 18, marginVertical: 10 }}>
           Ingresa tus datos para crear una cuenta
         </Text>

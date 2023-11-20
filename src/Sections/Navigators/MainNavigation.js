@@ -7,7 +7,6 @@ export default function MainNavigation() {
   const { dispatch } = React.useContext(ConfigContext);
   React.useEffect(() => {
     NetInfo.fetch().then((state) => {
-      console.log(state.isConnected);
       dispatch({ type: "SET_APP_READY", payload: state.isConnected });
     });
   }, []);

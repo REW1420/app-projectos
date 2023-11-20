@@ -32,7 +32,7 @@ const chartConfig = {
 
 export default function Dashboard() {
   const { state } = React.useContext(AppContext);
-  const width = Dimensions.get("window").width - 25; // from react-native
+  const width = Dimensions.get("window").width - 25;
 
   const toas = useToast();
   const dashboarNetworking = new DashboardController(toas);
@@ -44,7 +44,7 @@ export default function Dashboard() {
   const handleGetData = async () => {
     setRefreshing(true);
     const res = await dashboarNetworking.getDataFromID(state.userID);
-    console.log("res", res);
+
     const usefullData = res.kpi.map((item) => ({
       count: item.count,
       date: item.date,
@@ -82,12 +82,12 @@ export default function Dashboard() {
     const currentDate = new Date();
     const year = currentDate.getFullYear();
     const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-    const day = String(currentDate.getDate());
+    const day = String(currentDate.getDate() + 2);
     const formattedDate = `${year}-${month}-${day}`;
-    console.log(formattedDate);
+
     return formattedDate;
   }
-  console.log(kpiProject);
+
   return (
     <>
       <ScrollView
@@ -120,7 +120,6 @@ export default function Dashboard() {
             <Text style={{ fontSize: 15 }}>
               Pendientes : {kpiProject.pending}
             </Text>
-            <Text>Participando: 10</Text>
           </View>
 
           <ProgressChart
@@ -157,8 +156,6 @@ export default function Dashboard() {
             }}
             chartConfig={chartConfig}
             onDayPress={(day) => {
-              console.log(day);
-
               if (day.count === 0) {
                 toastService.CustomToast(
                   `No hay contribuciones el día ${formatDateString(day.date)}`

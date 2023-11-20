@@ -120,7 +120,7 @@ export default class Validation {
     const BASE_URL = "https://metriklass-api-qgrw-dev.fl0.io/";
     const res = await fetch(BASE_URL + "status");
     const resjson = await res.json();
-    // console.log(resjson);
+
     return new Promise((resolve, reject) => {
       if (resjson.isOnline === true) {
         resolve(true);
@@ -133,19 +133,17 @@ export default class Validation {
   validateNotNullData(data) {
     for (const key in data) {
       if (!data[key]) {
-        console.log(`el campo em ${key} esta vacio`);
         return false;
       }
     }
-    console.log("data not null");
+
     return true;
   }
   validateNotNullMisionData(misionData) {
     if (misionData.length === 0) {
-      console.log("El campo en mision está vacío.");
       return false;
     }
-    console.log("mission not null");
+
     return true;
   }
 
@@ -153,7 +151,6 @@ export default class Validation {
     if (array.length > 0) {
       for (const key in array) {
         if (!array[key]) {
-          console.log("El arreglo tiene un elemento vacío");
           return false;
         }
       }
@@ -161,5 +158,41 @@ export default class Validation {
     } else {
       return false;
     }
+  }
+
+  validateEditMisionData(missions) {
+    if (!Array.isArray(missions)) {
+      return false;
+    }
+
+    // Iterar sobre cada misión en la lista
+    for (const mission of missions) {
+      // Verificar si cada misión es un objeto
+      if (typeof mission !== "object" || mission === null) {
+        return false;
+      }
+
+      // Verificar la presencia y tipo de la propiedad 'description'
+      if (
+        typeof mission.description !== "string" ||
+        mission.description.trim() === ""
+      ) {
+        return false;
+      }
+
+      // Verificar la presencia y tipo de la propiedad 'misionName'
+      if (
+        typeof mission.misionName !== "string" ||
+        mission.misionName.trim() === ""
+      ) {
+        return false;
+      }
+
+      // Puedes agregar más validaciones según sea necesario
+    }
+
+    // Si no hay errores, la validación es exitosa
+
+    return true;
   }
 }

@@ -50,7 +50,7 @@ export default function FishishedProjects() {
   const handleGetData = async () => {
     const projects = await ProjecNetworking.getCloseProject(state.userID);
     setData2(projects);
-    console.log(projects);
+    
     setIsLoading(true);
     setRefreshing(false);
   };

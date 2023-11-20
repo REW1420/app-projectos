@@ -62,10 +62,8 @@ export default function PendingProjects() {
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log("Pantalla enfocada");
       handleGetData();
       return () => {
-        console.log("se desenfocada");
         handleGetData();
       };
     }, [])

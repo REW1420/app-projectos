@@ -32,7 +32,6 @@ export default function SearchProject() {
 
   React.useEffect(() => {
     fetchData();
-    console.log(data2);
   }, []);
 
   const [query, setQuery] = useState("");
