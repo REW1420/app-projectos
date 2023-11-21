@@ -11,4 +11,4 @@ https://drive.google.com/file/d/1cUskg3MYwabhugdxYGbhnTwKrbQ-yTCv/view?usp=drive
 instalacion android
 https://drive.google.com/file/d/1QrVM49u8IbLCwExbeq8OccrfmKOPHbGr/view
 ios
-https://drive.google.com/file/d/1oXIav5P8GqGnpx_wTUNN52Ayzq7aA5z0/view?usp=drive_link
+https://drive.google.com/file/d/15PQ08kbcQ1ip_fwBOUPNIsaELr45ryqp/view?usp=drive_link
